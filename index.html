@@ -447,12 +447,12 @@
                 <div class="difficulty-emoji">💀</div>
                 <div class="difficulty-name">Insane</div>
                 <div class="difficulty-stats">
-                    💰 25 Starting Gold<br>
-                    ❤️ 15 Lives<br>
+                    💰 35 Starting Gold<br>
+                    ❤️ 18 Lives<br>
                     ⚡⚡ 1.25x Enemy Speed<br>
-                    🛡️ 1.25x Enemy Health<br>
-                    💵 0.7x Rewards<br>
-                    ⏱️ 0.7x Spawn Delay
+                    🛡️ 1.2x Enemy Health<br>
+                    💵 0.75x Rewards<br>
+                    ⏱️ 0.75x Spawn Delay
                 </div>
             </div>
         </div>
@@ -526,12 +526,13 @@
             <button class="control-btn" onclick="startWave()">🌊 Start Wave</button>
             <button class="control-btn" onclick="togglePause()">⏸️ Pause</button>
             <button class="control-btn" onclick="toggleSpeed()" id="speedBtn">⚡ 1x</button>
+            <button class="control-btn" onclick="toggleTargetMode()" id="targetModeBtn">🎯 Furthest</button>
             <button class="control-btn save-btn" onclick="saveGame()">💾 Save</button>
             <button class="control-btn menu-btn-game" onclick="returnToMenu()">🏠 Menu</button>
             <button class="control-btn" onclick="resetGame()">🔄 Reset</button>
         </div>
         <div class="tooltip">
-            Click to place towers • Click towers to upgrade/sell • Boss every 15 waves! • Towers clear every 15 waves, new map! • Electric towers chain lightning! • Poison towers damage over time!
+            Click to place towers • Click towers to upgrade/sell • 🎯 button changes targeting • Boss every 15 waves! • Towers clear every 15 waves, new map! • Electric towers chain lightning! • Poison towers damage over time!
         </div>
     </div>
 
@@ -563,10 +564,10 @@
             },
             insane: {
                 name: "Insane", emoji: "💀",
-                startGold: 25, startLives: 15,
-                enemySpeedMult: 1.25, enemyHealthMult: 1.25,
-                rewardMult: 0.7, waveGoldBonus: 1.0,
-                enemySpawnDelayMult: 0.7
+                startGold: 35, startLives: 18,
+                enemySpeedMult: 1.25, enemyHealthMult: 1.2,
+                rewardMult: 0.75, waveGoldBonus: 1.0,
+                enemySpawnDelayMult: 0.75
             }
         };
 
@@ -780,6 +781,7 @@
                 t: gameState.towers.map(t => [
                     Math.round(t.x), Math.round(t.y), t.type, t.level, t.totalCost
                 ]),
+                tm: gameState.targetMode,
                 ti: levelThemes.indexOf(currentTheme)
             };
             const json = JSON.stringify(saveData);
@@ -885,7 +887,8 @@
                 totalKills: 0,
                 towersPlacedThisGame: 0,
                 upgradesUsedThisGame: 0,
-                waveCompletedAt4x: false
+                waveCompletedAt4x: false,
+                targetMode: saveData.tm || "furthest"
             };
 
             const themeIndex = saveData.ti || 0;
@@ -996,7 +999,8 @@
                 totalKills: 0,
                 towersPlacedThisGame: 0,
                 upgradesUsedThisGame: 0,
-                waveCompletedAt4x: false
+                waveCompletedAt4x: false,
+                targetMode: "furthest"
             };
 
             towerTypesPlacedThisGame = new Set();
@@ -1088,14 +1092,14 @@
 
         // Tower types
         const towerTypes = {
-            cannon: { cost: 25, damage: 20, range: 90, fireRate: 900, color: "#e74c3c", projectileSpeed: 4, size: 20, unlocked: true },
-            laser: { cost: 45, damage: 12, range: 130, fireRate: 350, color: "#3498db", projectileSpeed: 6, size: 18, unlocked: true },
-            missile: { cost: 70, damage: 35, range: 110, fireRate: 1500, color: "#9b59b6", projectileSpeed: 3, size: 22, aoe: true, aoeRadius: 35, unlocked: true },
-            sniper: { cost: 120, damage: 80, range: 200, fireRate: 2000, color: "#2c3e50", projectileSpeed: 10, size: 16, unlocked: true },
-            poison: { cost: 65, damage: 8, range: 95, fireRate: 1000, color: "#00b894", projectileSpeed: 5, size: 18, special: "poison", poisonDamage: 3, poisonDuration: 180, unlocked: false, unlockWave: 10 },
-            freeze: { cost: 90, damage: 5, range: 100, fireRate: 800, color: "#74b9ff", projectileSpeed: 5, size: 18, special: "freeze", unlocked: false, unlockWave: 20 },
-            plasma: { cost: 150, damage: 60, range: 120, fireRate: 1200, color: "#a29bfe", projectileSpeed: 7, size: 20, piercing: true, unlocked: false, unlockWave: 30 },
-            electric: { cost: 110, damage: 25, range: 100, fireRate: 1000, color: "#fdcb6e", projectileSpeed: 8, size: 19, special: "chain", chainRange: 60, maxChains: 3, unlocked: false, unlockWave: 35 }
+            cannon: { cost: 25, damage: 20, range: 90, fireRate: 900, color: "#e74c3c", projectileSpeed: 4, size: 20, accuracy: 0.7, unlocked: true },
+            laser: { cost: 45, damage: 12, range: 130, fireRate: 350, color: "#3498db", projectileSpeed: 6, size: 18, accuracy: 1.0, unlocked: true },
+            missile: { cost: 70, damage: 35, range: 110, fireRate: 1500, color: "#9b59b6", projectileSpeed: 3, size: 22, aoe: true, aoeRadius: 35, accuracy: 0.6, unlocked: true },
+            sniper: { cost: 120, damage: 80, range: 200, fireRate: 2000, color: "#2c3e50", projectileSpeed: 10, size: 16, accuracy: 1.0, unlocked: true },
+            poison: { cost: 65, damage: 8, range: 95, fireRate: 1000, color: "#00b894", projectileSpeed: 5, size: 18, special: "poison", poisonDamage: 3, poisonDuration: 180, accuracy: 0.5, unlocked: false, unlockWave: 10 },
+            freeze: { cost: 90, damage: 5, range: 100, fireRate: 800, color: "#74b9ff", projectileSpeed: 5, size: 18, special: "freeze", accuracy: 0.4, unlocked: false, unlockWave: 20 },
+            plasma: { cost: 150, damage: 60, range: 120, fireRate: 1200, color: "#a29bfe", projectileSpeed: 7, size: 20, piercing: true, accuracy: 0.8, unlocked: false, unlockWave: 30 },
+            electric: { cost: 110, damage: 25, range: 100, fireRate: 1000, color: "#fdcb6e", projectileSpeed: 8, size: 19, special: "chain", chainRange: 60, maxChains: 3, accuracy: 0.9, unlocked: false, unlockWave: 35 }
         };
 
         // Enemy types
@@ -1405,6 +1409,8 @@
                     this.stats.poisonDamage = Math.floor(baseStats.poisonDamage * (1 + (this.level - 1) * 0.5));
                     this.stats.poisonDuration = Math.floor(baseStats.poisonDuration * (1 + (this.level - 1) * 0.3));
                 }
+                // Accuracy improves with each upgrade (capped at 1.0)
+                this.stats.accuracy = Math.min(1.0, baseStats.accuracy + (this.level - 1) * 0.15);
                 if (this.level === 3) {
                     unlockAchievement("maxUpgrade");
                 }
@@ -1425,28 +1431,45 @@
             }
             findTarget() {
                 let bestTarget = null;
-                let bestPathProgress = -1;
+                let bestScore = null;
+                const mode = gameState.targetMode || "furthest";
                 for (let enemy of gameState.enemies) {
                     const dist = Math.sqrt(
                         Math.pow(enemy.x - this.x, 2) +
                         Math.pow(enemy.y - this.y, 2)
                     );
                     if (dist <= this.stats.range) {
-                        const target = path[enemy.pathIndex + 1];
-                        let progress = enemy.pathIndex;
-                        if (target) {
-                            const dx = target.x - enemy.x;
-                            const dy = target.y - enemy.y;
-                            const segmentDist = Math.sqrt(dx * dx + dy * dy);
-                            const totalSegmentDist = Math.sqrt(
-                                Math.pow(target.x - path[enemy.pathIndex].x, 2) +
-                                Math.pow(target.y - path[enemy.pathIndex].y, 2)
-                            );
-                            progress += 1 - (segmentDist / totalSegmentDist);
+                        let score = 0;
+                        if (mode === "furthest") {
+                            const target = path[enemy.pathIndex + 1];
+                            let progress = enemy.pathIndex;
+                            if (target) {
+                                const dx = target.x - enemy.x;
+                                const dy = target.y - enemy.y;
+                                const segmentDist = Math.sqrt(dx * dx + dy * dy);
+                                const totalSegmentDist = Math.sqrt(
+                                    Math.pow(target.x - path[enemy.pathIndex].x, 2) +
+                                    Math.pow(target.y - path[enemy.pathIndex].y, 2)
+                                );
+                                progress += 1 - (segmentDist / totalSegmentDist);
+                            }
+                            score = progress;
+                        } else if (mode === "closest") {
+                            score = -dist;
+                        } else if (mode === "lowestHealth") {
+                            score = -enemy.health;
+                        } else if (mode === "highestHealth") {
+                            score = enemy.health;
+                        } else if (mode === "fastest") {
+                            score = enemy.speed;
+                        } else if (mode === "slowest") {
+                            score = -enemy.speed;
+                        } else if (mode === "boss") {
+                            score = enemy.type === "boss" ? 999999 : enemy.maxHealth;
                         }
-                        if (progress > bestPathProgress) {
+                        if (bestScore === null || score > bestScore) {
                             bestTarget = enemy;
-                            bestPathProgress = progress;
+                            bestScore = score;
                         }
                     }
                 }
@@ -1657,11 +1680,35 @@
                 this.piercing = stats.piercing;
                 this.size = 4;
                 this.pierced = [];
-                const dx = target.x - x;
-                const dy = target.y - y;
+                // Calculate aim direction with accuracy-based leading
+                let aimX = target.x;
+                let aimY = target.y;
+                const accuracy = stats.accuracy || 0;
+                if (accuracy > 0 && target.pathIndex < path.length - 1) {
+                    const currentPoint = path[target.pathIndex];
+                    const nextPoint = path[target.pathIndex + 1];
+                    const segmentDx = nextPoint.x - currentPoint.x;
+                    const segmentDy = nextPoint.y - currentPoint.y;
+                    const segmentLen = Math.sqrt(segmentDx * segmentDx + segmentDy * segmentDy);
+                    const enemyVx = segmentLen > 0 ? (segmentDx / segmentLen) * target.speed : 0;
+                    const enemyVy = segmentLen > 0 ? (segmentDy / segmentLen) * target.speed : 0;
+                    const distToTarget = Math.sqrt(Math.pow(target.x - x, 2) + Math.pow(target.y - y, 2));
+                    const timeToHit = distToTarget / this.speed;
+                    const leadX = target.x + enemyVx * timeToHit * accuracy;
+                    const leadY = target.y + enemyVy * timeToHit * accuracy;
+                    aimX = leadX;
+                    aimY = leadY;
+                }
+                const dx = aimX - x;
+                const dy = aimY - y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                this.vx = (dx / distance) * this.speed;
-                this.vy = (dy / distance) * this.speed;
+                if (distance === 0) {
+                    this.vx = 0;
+                    this.vy = 0;
+                } else {
+                    this.vx = (dx / distance) * this.speed;
+                    this.vy = (dy / distance) * this.speed;
+                }
             }
             update() {
                 this.x += this.vx * gameState.speedMultiplier;
@@ -1839,7 +1886,8 @@
                 } else if (tower.type === "poison") {
                     extraInfo = " | Poison: " + tower.stats.poisonDamage + "/tick for " + Math.floor(tower.stats.poisonDuration / 60) + "s";
                 }
-                towerInfo.innerHTML = "<strong>" + tower.type.toUpperCase() + " Tower (Level " + tower.level + ")</strong><br>Damage: " + tower.stats.damage + " | Range: " + tower.stats.range + " | Fire Rate: " + (1000 / tower.stats.fireRate).toFixed(1) + "/s" + extraInfo;
+                const accPercent = Math.round((tower.stats.accuracy || 0) * 100);
+                towerInfo.innerHTML = "<strong>" + tower.type.toUpperCase() + " Tower (Level " + tower.level + ")</strong><br>Damage: " + tower.stats.damage + " | Range: " + tower.stats.range + " | Fire Rate: " + (1000 / tower.stats.fireRate).toFixed(1) + "/s | Accuracy: " + accPercent + "%" + extraInfo;
                 if (tower.level >= 3) {
                     upgradeBtn.textContent = "⬆️ MAX LEVEL";
                     upgradeBtn.disabled = true;
@@ -2255,6 +2303,25 @@
                 gameState.speedMultiplier === 2 ? "⚡ 2x" : "⚡ 4x";
         }
 
+        const targetModes = ["furthest", "closest", "lowestHealth", "highestHealth", "fastest", "slowest", "boss"];
+        const targetModeLabels = {
+            furthest: "🎯 Furthest",
+            closest: "🎯 Closest",
+            lowestHealth: "🎯 Lowest HP",
+            highestHealth: "🎯 Highest HP",
+            fastest: "🎯 Fastest",
+            slowest: "🎯 Slowest",
+            boss: "🎯 Boss"
+        };
+
+        function toggleTargetMode() {
+            const currentIndex = targetModes.indexOf(gameState.targetMode);
+            const nextIndex = (currentIndex + 1) % targetModes.length;
+            gameState.targetMode = targetModes[nextIndex];
+            document.getElementById("targetModeBtn").textContent = targetModeLabels[gameState.targetMode];
+            showUnlockMessage(targetModeLabels[gameState.targetMode]);
+        }
+
         function updateTowerUI() {
             const towersContainer = document.getElementById("towersContainer");
             towersContainer.innerHTML = "";
@@ -2304,7 +2371,8 @@
                 totalKills: 0,
                 towersPlacedThisGame: 0,
                 upgradesUsedThisGame: 0,
-                waveCompletedAt4x: false
+                waveCompletedAt4x: false,
+                targetMode: "furthest"
             };
             document.getElementById("speedBtn").textContent = "⚡ 1x";
             currentTheme = levelThemes[0];
