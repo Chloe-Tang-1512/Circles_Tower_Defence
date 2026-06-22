@@ -308,6 +308,7 @@
         .tower-btn.plasma { background: linear-gradient(145deg, #a29bfe, #6c5ce7); }
         .tower-btn.electric { background: linear-gradient(145deg, #fdcb6e, #e17055); }
         .tower-btn.poison { background: linear-gradient(145deg, #00b894, #00a085); }
+        .tower-btn.piat { background: linear-gradient(145deg, #6c5ce7, #4834d4); }
         .tower-btn.selected {
             box-shadow: 0 0 20px rgba(255,255,255,0.8);
             transform: scale(1.1);
@@ -388,6 +389,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div id="mainMenu">
@@ -447,12 +449,12 @@
                 <div class="difficulty-emoji">💀</div>
                 <div class="difficulty-name">Insane</div>
                 <div class="difficulty-stats">
-                    💰 35 Starting Gold<br>
-                    ❤️ 18 Lives<br>
-                    ⚡⚡ 1.25x Enemy Speed<br>
+                    💰 25 Starting Gold<br>
+                    ❤️ 15 Lives<br>
+                    🔋 1.2x Enemy Speed<br>
                     🛡️ 1.2x Enemy Health<br>
-                    💵 0.75x Rewards<br>
-                    ⏱️ 0.75x Spawn Delay
+                    💵 0.7x Rewards<br>
+                    ⏱️ 0.7x Spawn Delay
                 </div>
             </div>
         </div>
@@ -564,10 +566,10 @@
             },
             insane: {
                 name: "Insane", emoji: "💀",
-                startGold: 35, startLives: 18,
-                enemySpeedMult: 1.25, enemyHealthMult: 1.2,
-                rewardMult: 0.75, waveGoldBonus: 1.0,
-                enemySpawnDelayMult: 0.75
+                startGold: 25, startLives: 15,
+                enemySpeedMult: 1.2, enemyHealthMult: 1.2,
+                rewardMult: 0.7, waveGoldBonus: 1.0,
+                enemySpawnDelayMult: 0.7
             }
         };
 
@@ -577,23 +579,23 @@
         // ===== ACHIEVEMENTS SYSTEM =====
         const achievements = {
             firstBlood: { id: "firstBlood", name: "First Blood", desc: "Defeat your first enemy", emoji: "🩸", unlocked: false },
-            wave5: { id: "wave5", name: "Getting Started", desc: "Reach wave 5", emoji: "🌊", unlocked: false },
-            wave10: { id: "wave10", name: "Wave Warrior", desc: "Reach wave 10", emoji: "🌊🌊", unlocked: false },
+            wave5: { id: "wave5", name: "Getting Started", desc: "Reach wave 5", emoji: "🏄", unlocked: false },
+            wave10: { id: "wave10", name: "Wave Warrior", desc: "Reach wave 10", emoji: "🌊", unlocked: false },
             wave15: { id: "wave15", name: "Wave Master", desc: "Complete wave 15", emoji: "👑", unlocked: false },
             noLivesLost: { id: "noLivesLost", name: "Perfect Defense", desc: "Complete a level without losing any lives", emoji: "🛡️", unlocked: false },
             maxUpgrade: { id: "maxUpgrade", name: "Maxed Out", desc: "Upgrade a tower to level 3", emoji: "⬆️", unlocked: false },
             allTowers: { id: "allTowers", name: "Arsenal", desc: "Place every tower type in one game", emoji: "🏗️", unlocked: false },
-            hardComplete: { id: "hardComplete", name: "Hardcore", desc: "Complete the game on Hard difficulty", emoji: "🔥", unlocked: false },
-            insaneComplete: { id: "insaneComplete", name: "Madness", desc: "Complete the game on Insane difficulty", emoji: "💀", unlocked: false },
-            endless20: { id: "endless20", name: "Endless", desc: "Reach wave 20 in Endless Mode", emoji: "♾️", unlocked: false },
+            hardComplete: { id: "hardComplete", name: "Hardcore", desc: "Defeat the level 5 boss on Hard difficulty", emoji: "🔥", unlocked: false },
+            insaneComplete: { id: "insaneComplete", name: "Madness", desc: "Defeat the level 5 boss on Insane difficulty", emoji: "💀", unlocked: false },
             rich: { id: "rich", name: "Mogul", desc: "Accumulate 500 gold", emoji: "💰", unlocked: false },
             tower10: { id: "tower10", name: "Fortress", desc: "Place 10 towers in one game", emoji: "🏰", unlocked: false },
-            kill100: { id: "kill100", name: "Centurion", desc: "Defeat 100 enemies total", emoji: "⚔️", unlocked: false },
+            kill100: { id: "kill100", name: "Centurion", desc: "Defeat 100 enemies total", emoji: "💯", unlocked: false },
             speedDemon: { id: "speedDemon", name: "Speed Demon", desc: "Complete a wave at 4x speed", emoji: "⚡", unlocked: false },
             bossSlayer: { id: "bossSlayer", name: "Boss Slayer", desc: "Defeat your first boss", emoji: "👹", unlocked: false },
-            easyComplete: { id: "easyComplete", name: "Warm Up", desc: "Complete the game on Easy difficulty", emoji: "🌱", unlocked: false },
-            laserShow: { id: "laserShow", name: "Laser Show", desc: "Place 3 laser towers at once", emoji: "🪫", unlocked: false },
-            noUpgrade: { id: "noUpgrade", name: "Pure Skill", desc: "Complete a level without upgrading any towers", emoji: "🎯", unlocked: false }
+            normalComplete: { id: "normalComplete", name: "Standard Issue", desc: "Defeat the level 5 boss on Normal difficulty", emoji: "⚔️", unlocked: false },
+            laserShow: { id: "laserShow", name: "Light Show", desc: "Place 3 laser towers at once", emoji: "🔋", unlocked: false },
+            noUpgrade: { id: "noUpgrade", name: "Pure Skill", desc: "Complete a level without upgrading any towers", emoji: "🎯", unlocked: false },
+            endless20: { id: "endless20", name: "Endless", desc: "Reach wave 20 in Endless Mode", emoji: "♾️", unlocked: false }
         };
 
         function loadAchievements() {
@@ -725,10 +727,10 @@
                     {x:400,y:150},{x:200,y:150},{x:200,y:300},{x:50,y:300},
                     {x:50,y:500},{x:800,y:500}
                 ],
-                towers: ["missile","sniper","cannon"],
+                towers: ["missile","sniper","piat"],
                 enemies: ["basic","heavy","armored"],
                 enemyHealthMult: 1.5, enemySpeedMult: 1.0, enemyRewardMult: 1.5,
-                description: "Heavy modern warfare - explosive missiles, precise snipers, and artillery cannons!"
+                description: "Heavy modern warfare - explosive missiles, precise snipers, and armor-breaking PIATs!"
             },
             {
                 name: "Nexus",
@@ -741,7 +743,7 @@
                     {x:450,y:450},{x:650,y:450},{x:650,y:250},{x:450,y:250},
                     {x:450,y:100},{x:800,y:100}
                 ],
-                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison"],
+                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat"],
                 enemies: ["basic","fast","heavy","armored","flying"],
                 enemyHealthMult: 1.8, enemySpeedMult: 1.1, enemyRewardMult: 2.0,
                 description: "The ultimate level - ALL towers available!"
@@ -896,7 +898,7 @@
                 const selectedTheme = levelThemes[gameState.endlessMapIndex];
                 currentTheme = {
                     ...selectedTheme,
-                    towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison"],
+                    towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat"],
                     enemies: ["basic","fast","heavy","armored","flying"]
                 };
             } else {
@@ -1099,7 +1101,8 @@
             poison: { cost: 65, damage: 8, range: 95, fireRate: 1000, color: "#00b894", projectileSpeed: 5, size: 18, special: "poison", poisonDamage: 3, poisonDuration: 180, accuracy: 0.5, unlocked: false, unlockWave: 10 },
             freeze: { cost: 90, damage: 5, range: 100, fireRate: 800, color: "#74b9ff", projectileSpeed: 5, size: 18, special: "freeze", accuracy: 0.4, unlocked: false, unlockWave: 20 },
             plasma: { cost: 150, damage: 60, range: 120, fireRate: 1200, color: "#a29bfe", projectileSpeed: 7, size: 20, piercing: true, accuracy: 0.8, unlocked: false, unlockWave: 30 },
-            electric: { cost: 110, damage: 25, range: 100, fireRate: 1000, color: "#fdcb6e", projectileSpeed: 8, size: 19, special: "chain", chainRange: 60, maxChains: 3, accuracy: 0.9, unlocked: false, unlockWave: 35 }
+            electric: { cost: 110, damage: 25, range: 100, fireRate: 1000, color: "#fdcb6e", projectileSpeed: 8, size: 19, special: "chain", chainRange: 60, maxChains: 3, accuracy: 0.9, unlocked: false, unlockWave: 35 },
+            piat: { cost: 150, damage: 5000, range: 125, fireRate: 5000, color: "#6c5ce7", projectileSpeed: 3, size: 22, aoe: true, aoeRadius: 40, accuracy: 0.9, armorBreak: true, unlocked: false, unlockWave: 15 }
         };
 
         // Enemy types
@@ -1350,6 +1353,11 @@
                     ctx.beginPath();
                     ctx.arc(this.x, drawY, this.size - 2, 0, Math.PI * 2);
                     ctx.stroke();
+                    // Armor shield icon
+                    ctx.fillStyle = "#34495e";
+                    ctx.font = "bold 10px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText("🛡️", this.x, drawY - this.size - 14);
                 }
                 if (this.flying) {
                     ctx.fillStyle = "rgba(255,255,255,0.3)";
@@ -1432,7 +1440,8 @@
             findTarget() {
                 let bestTarget = null;
                 let bestScore = null;
-                const mode = gameState.targetMode || "furthest";
+                // PIAT always targets highest HP enemy, ignoring global targetMode
+                const mode = this.type === "piat" ? "highestHealth" : (gameState.targetMode || "furthest");
                 for (let enemy of gameState.enemies) {
                     const dist = Math.sqrt(
                         Math.pow(enemy.x - this.x, 2) +
@@ -1745,6 +1754,18 @@
                             Math.pow(enemy.y - this.y, 2)
                         );
                         if (dist < this.aoeRadius) {
+                            // PIAT armor break: enemies in blast lose their armor
+                            if (this.type === "piat" && enemy.armor > 0) {
+                                enemy.armor = 0;
+                                for (let i = 0; i < 5; i++) {
+                                    gameState.particles.push(new Particle(
+                                        enemy.x, enemy.y,
+                                        Math.random() * 3 - 1.5,
+                                        Math.random() * 3 - 1.5,
+                                        "#a29bfe"
+                                    ));
+                                }
+                            }
                             if (enemy.takeDamage(this.damage, this.special)) {
                                 gameState.enemies.splice(gameState.enemies.indexOf(enemy), 1);
                             }
@@ -1755,7 +1776,7 @@
                             this.x, this.y,
                             Math.random() * 6 - 3,
                             Math.random() * 6 - 3,
-                            "#ff6b6b"
+                            this.type === "piat" ? "#6c5ce7" : "#ff6b6b"
                         ));
                     }
                 } else {
@@ -1789,6 +1810,11 @@
                     ctx.shadowColor = "#a29bfe";
                     ctx.shadowBlur = 15;
                     this.size = 5;
+                } else if (this.type === "piat") {
+                    ctx.fillStyle = "#6c5ce7";
+                    ctx.shadowColor = "#6c5ce7";
+                    ctx.shadowBlur = 12;
+                    this.size = 7;
                 } else {
                     ctx.fillStyle = "#e74c3c";
                     ctx.shadowColor = "#e74c3c";
@@ -1885,9 +1911,12 @@
                     extraInfo = " | Chains: " + tower.stats.maxChains;
                 } else if (tower.type === "poison") {
                     extraInfo = " | Poison: " + tower.stats.poisonDamage + "/tick for " + Math.floor(tower.stats.poisonDuration / 60) + "s";
+                } else if (tower.type === "piat") {
+                    extraInfo = " | 💥 Armor Break AoE";
                 }
                 const accPercent = Math.round((tower.stats.accuracy || 0) * 100);
-                towerInfo.innerHTML = "<strong>" + tower.type.toUpperCase() + " Tower (Level " + tower.level + ")</strong><br>Damage: " + tower.stats.damage + " | Range: " + tower.stats.range + " | Fire Rate: " + (1000 / tower.stats.fireRate).toFixed(1) + "/s | Accuracy: " + accPercent + "%" + extraInfo;
+                const infoName = tower.type === "piat" ? "PIAT" : tower.type.toUpperCase();
+                towerInfo.innerHTML = "<strong>" + infoName + " Tower (Level " + tower.level + ")</strong><br>Damage: " + tower.stats.damage + " | Range: " + tower.stats.range + " | Fire Rate: " + (1000 / tower.stats.fireRate).toFixed(1) + "/s | Accuracy: " + accPercent + "%" + extraInfo;
                 if (tower.level >= 3) {
                     upgradeBtn.textContent = "⬆️ MAX LEVEL";
                     upgradeBtn.disabled = true;
@@ -1936,7 +1965,7 @@
                 gameState.towersPlacedThisGame++;
                 if (gameState.towersPlacedThisGame >= 10) unlockAchievement("tower10");
                 towerTypesPlacedThisGame.add(gameState.selectedTower);
-                if (towerTypesPlacedThisGame.size >= 8) {
+                if (towerTypesPlacedThisGame.size >= 9) {
                     unlockAchievement("allTowers");
                 }
                 const laserCount = gameState.towers.filter(t => t.type === "laser").length;
@@ -2023,6 +2052,10 @@
             }
             gameState.level++;
             if (gameState.level > 5 && !gameState.endlessMode) {
+                const diff = gameState.difficulty || currentDifficulty || "normal";
+                if (diff === "normal") unlockAchievement("normalComplete");
+                if (diff === "hard") unlockAchievement("hardComplete");
+                if (diff === "insane") unlockAchievement("insaneComplete");
                 showEndlessChoice();
                 return;
             }
@@ -2106,7 +2139,7 @@
             const selectedTheme = levelThemes[mapIndex];
             currentTheme = {
                 ...selectedTheme,
-                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison"],
+                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat"],
                 enemies: ["basic","fast","heavy","armored","flying"]
             };
             path = currentTheme.path;
@@ -2130,9 +2163,6 @@
             }
             title.style.cssText = "font-size:32px;margin-bottom:10px;text-shadow:2px 2px 4px rgba(0,0,0,0.5);";
             const stats = document.createElement("p");
-            if (gameState.difficulty === "easy") unlockAchievement("easyComplete");
-            if (gameState.difficulty === "hard") unlockAchievement("hardComplete");
-            if (gameState.difficulty === "insane") unlockAchievement("insaneComplete");
             if (waveReached) {
                 stats.innerHTML = "Final Wave: <strong>" + waveReached + "</strong><br>Levels Completed: <strong>5</strong><br>What a run!";
             } else {
@@ -2140,13 +2170,13 @@
             }
             stats.style.cssText = "font-size:18px;margin-bottom:30px;text-align:center;line-height:1.6;";
             const restartBtn = document.createElement("button");
-            restartBtn.textContent = "🔄 Play Again";
-            restartBtn.style.cssText = "background:linear-gradient(145deg,#e74c3c,#c0392b);color:white;border:none;padding:15px 40px;border-radius:25px;cursor:pointer;font-weight:bold;font-size:18px;transition:all 0.3s;";
+            restartBtn.textContent = "🏠 Menu";
+            restartBtn.style.cssText = "background:linear-gradient(145deg,#7f8c8d,#95a5a6);color:white;border:none;padding:15px 40px;border-radius:25px;cursor:pointer;font-weight:bold;font-size:18px;transition:all 0.3s;";
             restartBtn.onmouseover = () => restartBtn.style.transform = "scale(1.05)";
             restartBtn.onmouseout = () => restartBtn.style.transform = "scale(1)";
             restartBtn.onclick = () => {
                 document.body.removeChild(overlay);
-                resetGame();
+                returnToMenu();
             };
             overlay.appendChild(trophy);
             overlay.appendChild(title);
@@ -2215,10 +2245,12 @@
             updateTowerUI();
             gameState.waveInProgress = true;
             gameState.enemiesSpawned = 0;
-            if (gameState.wave === 14) {
-                showUnlockMessage("⚠️ WARNING for wave 14: Wave 15 is a BOSS WAVE! 🔒 Tower placement & upgrades will be LOCKED! Prepare now!");
+            const bossInterval = gameState.endlessMode ? 20 : 15;
+            const nextBossWave = Math.ceil(gameState.wave / bossInterval) * bossInterval;
+            if (gameState.wave === nextBossWave - 1) {
+                showUnlockMessage("⚠️ WARNING: Wave " + nextBossWave + " is a BOSS WAVE! 🔒 Tower placement & upgrades will be LOCKED! Prepare now!");
             }
-            if (gameState.wave % 15 === 0 && gameState.wave >= 15) {
+            if (gameState.wave % bossInterval === 0 && gameState.wave >= bossInterval) {
                 gameState.bossWaveActive = true;
                 const enemyCountPerType = (gameState.level === 5 || gameState.endlessMode) ? 20 : 15;
                 gameState.enemiesInWave = enemyCountPerType * currentTheme.enemies.length + 1;
@@ -2246,7 +2278,8 @@
                     gameState.wave++;
                     gameState.waveInProgress = false;
                     clearInterval(spawnInterval);
-                    if (completedWave % 15 === 0 && completedWave >= 15) {
+                    const isBossWave = gameState.endlessMode ? (completedWave % 20 === 0 && completedWave >= 20) : (completedWave % 15 === 0 && completedWave >= 15);
+                    if (isBossWave) {
                         gameState.bossWaveActive = false;
                         gameState.gold += 150;
                         unlockAchievement("bossSlayer");
@@ -2259,11 +2292,13 @@
                     if (gameState.endlessMode && completedWave >= 20) unlockAchievement("endless20");
                     if (gameState.speedMultiplier === 4) unlockAchievement("speedDemon");
                     updateUI();
-                    if (completedWave % 15 === 0 && completedWave >= 15) {
+                    if (isBossWave) {
                         if (gameState.level === 5 || gameState.endlessMode) {
                             startBossTowerDestroyTimer();
                         }
-                        setTimeout(() => { advanceToNextLevel(); }, 2000);
+                        if (!gameState.endlessMode) {
+                            setTimeout(() => { advanceToNextLevel(); }, 2000);
+                        }
                     }
                 }
             }, spawnDelay);
@@ -2334,9 +2369,10 @@
                 const emoji = {
                     cannon: "🔴", laser: "🪫", missile: "🚀",
                     sniper: "🎯", freeze: "❄️", plasma: "⭐",
-                    electric: "⚡", poison: "☠️"
+                    electric: "⚡", poison: "☠️", piat: "💥"
                 }[type];
-                button.textContent = emoji + " " + type.charAt(0).toUpperCase() + type.slice(1) + " (" + tower.cost + ")";
+                const displayName = type === "piat" ? "PIAT" : type.charAt(0).toUpperCase() + type.slice(1);
+                button.textContent = emoji + " " + displayName + " (" + tower.cost + ")";
                 towersContainer.appendChild(button);
             });
         }
