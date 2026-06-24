@@ -665,7 +665,8 @@
             {
                 name: "Classic",
                 bgColor: "#3F9B0B",
-                pathColor: "rgba(139,69,19,0.8)",
+                bgImage: "classic_bg.png",
+                pathColor: "rgb(101,55,24)",
                 pathColorLight: "#8b4513",
                 path: [
                     {x:0,y:100},{x:80,y:100},{x:80,y:200},{x:220,y:200},
@@ -684,7 +685,8 @@
             {
                 name: "Sci-Fi",
                 bgColor: "#38475c",
-                pathColor: "rgba(0,255,255,0.8)",
+                bgImage: "scifi_bg.png",
+                pathColor: "rgb(0,200,200)",
                 pathColorLight: "#00a8cc",
                 path: [
                     {x:0,y:50},{x:150,y:50},{x:150,y:500},{x:300,y:500},
@@ -701,7 +703,8 @@
             {
                 name: "Biohazard",
                 bgColor: "#252114",
-                pathColor: "rgba(57,255,20,0.85)",
+                bgImage: "biohazard_bg.png",
+                pathColor: "rgb(45,200,15)",
                 pathColorLight: "#39ff14",
                 path: [
                     {x:0,y:80},{x:120,y:80},{x:120,y:200},{x:280,y:200},
@@ -718,7 +721,8 @@
             {
                 name: "Warzone",
                 bgColor: "#3d2b1f",
-                pathColor: "rgba(90, 82, 75, 0.8)",
+                bgImage: "warzone_bg.png",
+                pathColor: "rgb(75,68,62)",
                 pathColorLight: "#8a7a6a",
                 path: [
                     {x:0,y:300},{x:100,y:300},{x:100,y:100},{x:300,y:100},
@@ -735,8 +739,9 @@
             {
                 name: "Nexus",
                 bgColor: "#1a0a2e",
-                pathColor: "rgba(149, 0, 255, 0.8)",
-                pathColorLight: "#7a00cc",
+                bgImage: "nexus_bg.png",
+                pathColor: "rgb(120,0,200)",
+                pathColorLight: "#b64cfd",
                 path: [
                     {x:0,y:100},{x:350,y:100},{x:350,y:250},{x:150,y:250},
                     {x:150,y:450},{x:350,y:450},{x:350,y:550},{x:450,y:550},
@@ -768,6 +773,15 @@
         let currentTheme = levelThemes[0];
         let path = currentTheme.path;
         let mouseX = 0, mouseY = 0;
+
+        // Preload background images
+        levelThemes.forEach(theme => {
+            if (theme.bgImage) {
+                const img = new Image();
+                img.src = theme.bgImage;
+                theme.bgImageObj = img;
+            }
+        });
 
         // ===== SAVE / LOAD SYSTEM =====
         function serializeGameState() {
@@ -2442,8 +2456,9 @@
         }
 
         function drawPath() {
-            ctx.strokeStyle = currentTheme.pathColor;
-            ctx.lineWidth = 25;
+            // Outer glow layer (solid, lighter color)
+            ctx.strokeStyle = currentTheme.pathColorLight;
+            ctx.lineWidth = 32;
             ctx.lineCap = "round";
             ctx.beginPath();
             ctx.moveTo(path[0].x, path[0].y);
@@ -2451,16 +2466,15 @@
                 ctx.lineTo(path[i].x, path[i].y);
             }
             ctx.stroke();
-            ctx.strokeStyle = currentTheme.pathColorLight;
-            ctx.lineWidth = 30;
-            ctx.globalAlpha = 0.3;
+            // Inner core layer (solid, main color)
+            ctx.strokeStyle = currentTheme.pathColor;
+            ctx.lineWidth = 24;
             ctx.beginPath();
             ctx.moveTo(path[0].x, path[0].y);
             for (let i = 1; i < path.length; i++) {
                 ctx.lineTo(path[i].x, path[i].y);
             }
             ctx.stroke();
-            ctx.globalAlpha = 1;
         }
 
         function drawRangePreview() {
@@ -2482,8 +2496,12 @@
         }
 
         function gameLoop() {
-            ctx.fillStyle = currentTheme.bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (currentTheme.bgImageObj && currentTheme.bgImageObj.complete && currentTheme.bgImageObj.naturalWidth > 0) {
+                ctx.drawImage(currentTheme.bgImageObj, 0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = currentTheme.bgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
             if (!gameState.paused) {
                 gameState.enemies = gameState.enemies.filter(enemy => enemy.update());
                 gameState.towers.forEach(tower => tower.update());
