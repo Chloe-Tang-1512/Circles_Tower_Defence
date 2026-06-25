@@ -744,7 +744,7 @@
                 bgImage: "biohazard_bg.png",
                 pathColor: "rgb(45,200,15)",
                 pathColorLight: "#39ff14",
-                spell: { name: "Quarantine", emoji: "☣️", desc: "Pause spawn & poison all", cooldown: 60000, color: "#39ff14" },
+                spell: { name: "Quarantine", emoji: "☣️", desc: "Halt spawn, poison all until cleared", cooldown: 60000, color: "#39ff14" },
                 path: [
                     {x:0,y:80},{x:120,y:80},{x:120,y:200},{x:280,y:200},
                     {x:280,y:80},{x:440,y:80},{x:440,y:250},{x:600,y:250},
@@ -2560,25 +2560,26 @@
         }
 
         function castQuarantine() {
-            // Pause spawning and poison all enemies for 10s, cooldown starts after spell ends
+            // Halt spawning, apply high-damage permanent poison to all enemies
+            // Resume spawning only after all enemies die or exit
             const wasInProgress = gameState.waveInProgress;
             gameState.waveInProgress = false; // pause spawning
 
             gameState.enemies.forEach(enemy => {
-                enemy.poisoned = 600; // 10 seconds at 60fps
-                enemy.poisonDamage = 5;
+                enemy.poisoned = -1; // permanent poison until death
+                enemy.poisonDamage = 25; // high damage
             });
 
-            showUnlockMessage("☣️ QUARANTINE! Spawning paused, all enemies poisoned!");
+            showUnlockMessage("☣️ QUARANTINE! Spawning halted - all enemies quarantined!");
 
-            // Spawn poison particles continuously for the full duration
+            // Spawn poison particles continuously while poisoned enemies exist
             const particleInterval = setInterval(() => {
                 if (!gameState.gameRunning) {
                     clearInterval(particleInterval);
                     return;
                 }
                 gameState.enemies.forEach(enemy => {
-                    if (enemy.poisoned > 0) {
+                    if (enemy.poisoned > 0 || enemy.poisoned === -1) {
                         for (let i = 0; i < 3; i++) {
                             gameState.particles.push(new Particle(
                                 enemy.x + (Math.random() - 0.5) * enemy.size,
@@ -2592,14 +2593,32 @@
                 });
             }, 100);
 
-            gameState.spellTimer = setTimeout(() => {
-                clearInterval(particleInterval);
-                gameState.waveInProgress = wasInProgress; // resume spawning
-                gameState.spellActive = false;
-                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
-                showUnlockMessage("☣️ Quarantine ended");
-                updateSpellButton();
-            }, 10000);
+            // Check every 500ms if all enemies are gone
+            gameState.spellTimer = setInterval(() => {
+                if (!gameState.gameRunning) {
+                    clearInterval(particleInterval);
+                    clearInterval(gameState.spellTimer);
+                    gameState.spellTimer = null;
+                    return;
+                }
+
+                if (gameState.enemies.length === 0) {
+                    // All enemies dead or exited
+                    clearInterval(particleInterval);
+                    clearInterval(gameState.spellTimer);
+                    gameState.spellTimer = null;
+
+                    // Resume spawning if wave still has enemies to spawn
+                    if (gameState.enemiesSpawned < gameState.enemiesInWave) {
+                        gameState.waveInProgress = wasInProgress;
+                    }
+
+                    gameState.spellActive = false;
+                    gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                    showUnlockMessage("☣️ Quarantine lifted - all enemies cleared!");
+                    updateSpellButton();
+                }
+            }, 500);
         }
 
         function castAirstrike() {
