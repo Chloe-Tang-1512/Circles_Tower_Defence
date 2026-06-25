@@ -2397,7 +2397,12 @@
         }
 
         function resetGame() {
-            
+            // Clear any active spell timers/intervals before resetting
+            if (gameState.spellTimer) {
+                clearInterval(gameState.spellTimer);
+                clearTimeout(gameState.spellTimer);
+                gameState.spellTimer = null;
+            }
             gameState = {
                 gold: currentDiffSettings.startGold,
                 lives: currentDiffSettings.startLives,
@@ -2532,6 +2537,7 @@
             });
             showUnlockMessage("⚡ BOOST! Towers deal 2x damage for 15s!");
             gameState.spellTimer = setTimeout(() => {
+                if (!gameState.spellActive) return; // spell was cancelled (e.g. player died)
                 gameState.towers.forEach(tower => {
                     tower.stats.damage /= 2;
                 });
@@ -2549,6 +2555,7 @@
             });
             showUnlockMessage("🔋 OVERDRIVE! Towers fire 2x faster for 15s!");
             gameState.spellTimer = setTimeout(() => {
+                if (!gameState.spellActive) return; // spell was cancelled (e.g. player died)
                 gameState.towers.forEach(tower => {
                     tower.stats.fireRate *= 2;
                 });
@@ -2594,29 +2601,29 @@
             }, 100);
 
             // Check every 500ms if all enemies are gone
-            gameState.spellTimer = setInterval(() => {
+            const checkInterval = setInterval(() => {
                 if (!gameState.gameRunning) {
                     clearInterval(particleInterval);
-                    clearInterval(gameState.spellTimer);
-                    gameState.spellTimer = null;
+                    clearInterval(checkInterval);
                     return;
                 }
 
                 if (gameState.enemies.length === 0) {
                     // All enemies dead or exited
                     clearInterval(particleInterval);
-                    clearInterval(gameState.spellTimer);
-                    gameState.spellTimer = null;
+                    clearInterval(checkInterval);
 
                     // Resume spawning if wave still has enemies to spawn
                     if (gameState.enemiesSpawned < gameState.enemiesInWave) {
                         gameState.waveInProgress = wasInProgress;
                     }
 
-                    gameState.spellActive = false;
-                    gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
-                    showUnlockMessage("☣️ Quarantine lifted - all enemies cleared!");
-                    updateSpellButton();
+                    if (gameState.spellActive) { // only if spell wasn't already cancelled
+                        gameState.spellActive = false;
+                        gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                        showUnlockMessage("☣️ Quarantine lifted - all enemies cleared!");
+                        updateSpellButton();
+                    }
                 }
             }, 500);
         }
@@ -2662,15 +2669,16 @@
             setTimeout(() => { if (document.body.contains(flash)) document.body.removeChild(flash); }, 300 / gameState.speedMultiplier);
 
             // Strike random enemies every 5 seconds until wave ends
-            gameState.spellTimer = setInterval(() => {
-                // End when wave is over
+            const stormInterval = setInterval(() => {
+                // End when wave is over or game stops
                 if (!gameState.waveInProgress || !gameState.gameRunning) {
-                    clearInterval(gameState.spellTimer);
-                    gameState.spellTimer = null;
-                    gameState.spellActive = false;
-                    gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
-                    showUnlockMessage("🌌 Cosmic Storm ended - cooldown started");
-                    updateSpellButton();
+                    clearInterval(stormInterval);
+                    if (gameState.spellActive) { // only if spell wasn't already cancelled
+                        gameState.spellActive = false;
+                        gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                        showUnlockMessage("🌌 Cosmic Storm ended - cooldown started");
+                        updateSpellButton();
+                    }
                     return;
                 }
 
