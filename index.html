@@ -313,6 +313,28 @@
             box-shadow: 0 0 20px rgba(255,255,255,0.8);
             transform: scale(1.1);
         }
+        .tower-btn.spell-btn {
+            background: linear-gradient(145deg, #9b59b6, #8e44ad);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 0 15px;
+            height: 36px;
+            box-shadow: 0 5px 15px rgba(155,89,182,0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        .tower-btn.spell-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(155,89,182,0.5);
+        }
+        .tower-btn.spell-btn.cooldown {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         #towerControls {
             margin-top: 10px; text-align: center;
             background: rgba(0,0,0,0.2);
@@ -420,6 +442,7 @@
             animation: fadeInOut 0.3s ease-out;
         }
     </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -568,7 +591,7 @@
             <button class="control-btn save-btn" onclick="saveGame()">💾 Save</button>
             <button class="control-btn menu-btn-game" onclick="returnToMenu()">🏠 Menu</button>
             <button class="control-btn" onclick="resetGame()">🔄 Reset</button>
-            <button class="control-btn" onclick="castSpell()" id="spellBtn" style="display:none">✨ Spell</button>
+            <!-- Spell button moved to tower bar -->
         </div>
         <div class="tooltip">
             Click to place towers • Click towers to upgrade/sell • 🎯 button changes targeting • Boss every 15 waves! • Towers clear every 15 waves, new map! • Electric towers chain lightning! • Poison towers damage over time!
@@ -782,7 +805,7 @@
                 bgImage: "nexus_bg.png",
                 pathColor: "rgb(120,0,200)",
                 pathColorLight: "#b64cfd",
-                spell: { name: "Cosmic Storm", emoji: "🌌", desc: "Random lightning kills", cooldown: 60000, color: "#b64cfd" },
+                spell: { name: "Cosmic Storm", emoji: "⛈️", desc: "Random lightning kills", cooldown: 60000, color: "#b64cfd" },
                 path: [
                     {x:0,y:100},{x:350,y:100},{x:350,y:250},{x:150,y:250},
                     {x:150,y:450},{x:350,y:450},{x:350,y:550},{x:450,y:550},
@@ -2388,9 +2411,17 @@
                 button.textContent = emoji + " " + displayName + " (" + tower.cost + ")";
                 towersContainer.appendChild(button);
             });
-        }
-
-        function togglePause() {
+            // Add spell button if this theme has one
+            const spell = currentTheme.spell;
+            if (spell) {
+                const spellBtn = document.createElement("button");
+                spellBtn.className = "tower-btn spell-btn";
+                spellBtn.id = "spellTowerBtn";
+                spellBtn.onclick = () => castSpell();
+                spellBtn.textContent = spell.emoji + " " + spell.name + " (Spell)";
+                towersContainer.appendChild(spellBtn);
+            }
+        }function togglePause() {
             gameState.paused = !gameState.paused;
             document.querySelector("#controls button:nth-child(2)").textContent =
                 gameState.paused ? "▶️ Resume" : "⏸️ Pause";
@@ -2726,7 +2757,7 @@
         }
 
         function updateSpellButton() {
-            const btn = document.getElementById("spellBtn");
+            const btn = document.getElementById("spellTowerBtn");
             if (!btn) return;
 
             const spell = currentTheme.spell;
