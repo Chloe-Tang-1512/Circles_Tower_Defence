@@ -385,7 +385,43 @@
         .achievement-popup .ach-emoji { font-size: 24px; margin-right: 8px; }
         .achievement-popup .ach-title { font-size: 14px; opacity: 0.8; }
         .achievement-popup .ach-name { font-size: 16px; }
+        .control-btn.spell-btn {
+            background: linear-gradient(145deg, #9b59b6, #8e44ad);
+            position: relative;
+            overflow: hidden;
+        }
+        .control-btn.spell-btn:hover {
+            box-shadow: 0 5px 15px rgba(155,89,182,0.4);
+        }
+        .control-btn.spell-btn.cooldown {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .control-btn.spell-btn .cooldown-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            transition: height 0.1s linear;
+        }
+        @keyframes cosmicStrike {
+            0% { opacity: 0; transform: scale(0.5); }
+            20% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(2); }
+        }
+        .cosmic-flash {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(182,76,253,0.3);
+            pointer-events: none;
+            z-index: 3000;
+            animation: fadeInOut 0.3s ease-out;
+        }
     </style>
+<base target="_blank">
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -505,7 +541,7 @@
             <div id="statsBar">
                 <div class="stat">💰 Gold: <span id="gold">75</span></div>
                 <div class="stat">❤️ Lives: <span id="lives">20</span></div>
-                <div class="stat">🌊 Wave: <span id="wave">1</span>/<span id="waveMax">15</span></div>
+                <div class="stat">🌊 Wave: <span id="wave">1</span><span id="waveMax">/15</span></div>
 
                 <div class="stat">🏆 Level: <span id="level">1</span></div>
                 <div class="stat" id="themeDisplay">🏰 Classic</div>
@@ -532,6 +568,7 @@
             <button class="control-btn save-btn" onclick="saveGame()">💾 Save</button>
             <button class="control-btn menu-btn-game" onclick="returnToMenu()">🏠 Menu</button>
             <button class="control-btn" onclick="resetGame()">🔄 Reset</button>
+            <button class="control-btn" onclick="castSpell()" id="spellBtn" style="display:none">✨ Spell</button>
         </div>
         <div class="tooltip">
             Click to place towers • Click towers to upgrade/sell • 🎯 button changes targeting • Boss every 15 waves! • Towers clear every 15 waves, new map! • Electric towers chain lightning! • Poison towers damage over time!
@@ -668,6 +705,7 @@
                 bgImage: "classic_bg.png",
                 pathColor: "rgb(101,55,24)",
                 pathColorLight: "#8b4513",
+                spell: { name: "Boost", emoji: "⚡", desc: "2x Tower Damage for 5s", cooldown: 60000, color: "#f1c40f" },
                 path: [
                     {x:0,y:100},{x:80,y:100},{x:80,y:200},{x:220,y:200},
                     {x:220,y:60},{x:350,y:60},{x:350,y:180},{x:450,y:180},
@@ -688,6 +726,7 @@
                 bgImage: "scifi_bg.png",
                 pathColor: "rgb(0,200,200)",
                 pathColorLight: "#00a8cc",
+                spell: { name: "Overdrive", emoji: "🔋", desc: "2x Fire Rate for 5s", cooldown: 60000, color: "#00ffff" },
                 path: [
                     {x:25, y:300}, {x:25, y:100}, {x:175, y:100}, {x:175, y:500},
                     {x:325, y:500}, {x:325, y:100}, {x:475, y:100}, {x:475, y:500},
@@ -705,6 +744,7 @@
                 bgImage: "biohazard_bg.png",
                 pathColor: "rgb(45,200,15)",
                 pathColorLight: "#39ff14",
+                spell: { name: "Quarantine", emoji: "☣️", desc: "Pause spawn & poison all", cooldown: 60000, color: "#39ff14" },
                 path: [
                     {x:0,y:80},{x:120,y:80},{x:120,y:200},{x:280,y:200},
                     {x:280,y:80},{x:440,y:80},{x:440,y:250},{x:600,y:250},
@@ -723,6 +763,7 @@
                 bgImage: "warzone_bg.png",
                 pathColor: "rgb(75,68,62)",
                 pathColorLight: "#8a7a6a",
+                spell: { name: "Airstrike", emoji: "✈️", desc: "Massive damage to all", cooldown: 60000, color: "#e74c3c" },
                 path: [
                     {x:0,y:300},{x:100,y:300},{x:100,y:100},{x:300,y:100},
                     {x:300,y:500},{x:500,y:500},{x:500,y:100},{x:700,y:100},
@@ -741,6 +782,7 @@
                 bgImage: "nexus_bg.png",
                 pathColor: "rgb(120,0,200)",
                 pathColorLight: "#b64cfd",
+                spell: { name: "Cosmic Storm", emoji: "🌌", desc: "Random lightning kills", cooldown: 60000, color: "#b64cfd" },
                 path: [
                     {x:0,y:100},{x:350,y:100},{x:350,y:250},{x:150,y:250},
                     {x:150,y:450},{x:350,y:450},{x:350,y:550},{x:450,y:550},
@@ -764,7 +806,6 @@
             enemiesSpawned: 0, enemiesInWave: 8,
             speedMultiplier: 1,
             endlessMode: false, endlessMapIndex: 0,
-            bossTowerDestroyTimer: null,
             difficulty: "normal",
             livesLostThisLevel: 0
         };
@@ -876,9 +917,7 @@
             currentDifficulty = saveData.d;
             currentDiffSettings = difficultySettings[currentDifficulty];
 
-            if (gameState.bossTowerDestroyTimer) {
-                clearInterval(gameState.bossTowerDestroyTimer);
-            }
+            
 
             gameState = {
                 gold: saveData.g || currentDiffSettings.startGold,
@@ -891,19 +930,24 @@
                 particles: [], lightningEffects: [],
                 gameRunning: false, paused: false,
                 waveInProgress: false, bossWaveActive: false,
+                spellCooldownEnd: 0,
+                spellActive: false,
+                spellTimer: null,
                 enemiesSpawned: 0,
                 enemiesInWave: 8 + (saveData.w || 1) * 3,
                 speedMultiplier: 1,
                 endlessMode: saveData.em || false,
                 endlessMapIndex: saveData.emi || 0,
-                bossTowerDestroyTimer: null,
                 difficulty: currentDifficulty,
                 livesLostThisLevel: 0,
                 totalKills: 0,
                 towersPlacedThisGame: 0,
                 upgradesUsedThisGame: 0,
                 waveCompletedAt4x: false,
-                targetMode: saveData.tm || "furthest"
+                targetMode: saveData.tm || "furthest",
+                spellCooldownEnd: 0,
+                spellActive: false,
+                spellTimer: null
             };
 
             const themeIndex = saveData.ti || 0;
@@ -991,9 +1035,7 @@
         function startNewGame() {
             currentDiffSettings = difficultySettings[currentDifficulty];
 
-            if (gameState.bossTowerDestroyTimer) {
-                clearInterval(gameState.bossTowerDestroyTimer);
-            }
+            
 
             gameState = {
                 gold: currentDiffSettings.startGold,
@@ -1005,10 +1047,12 @@
                 particles: [], lightningEffects: [],
                 gameRunning: false, paused: false,
                 waveInProgress: false, bossWaveActive: false,
+                spellCooldownEnd: 0,
+                spellActive: false,
+                spellTimer: null,
                 enemiesSpawned: 0, enemiesInWave: 8,
                 speedMultiplier: 1,
                 endlessMode: false, endlessMapIndex: 0,
-                bossTowerDestroyTimer: null,
                 difficulty: currentDifficulty,
                 livesLostThisLevel: 0,
                 totalKills: 0,
@@ -1045,10 +1089,7 @@
         }
 
         function returnToMenu() {
-            if (gameState.bossTowerDestroyTimer) {
-                clearInterval(gameState.bossTowerDestroyTimer);
-                gameState.bossTowerDestroyTimer = null;
-            }
+            
             gameState.paused = true;
             document.getElementById("gameContainer").classList.remove("active");
             document.getElementById("mainMenu").classList.remove("hidden");
@@ -1130,9 +1171,10 @@
 
         // Lightning Effect class
         class LightningEffect {
-            constructor(x1, y1, x2, y2) {
+            constructor(x1, y1, x2, y2, color) {
                 this.x1 = x1; this.y1 = y1;
                 this.x2 = x2; this.y2 = y2;
+                this.color = color || "#fdcb6e";
                 this.life = 15;
                 this.segments = this.generateSegments();
             }
@@ -1161,9 +1203,9 @@
             draw() {
                 const alpha = this.life / 15;
                 ctx.globalAlpha = alpha;
-                ctx.strokeStyle = "#fdcb6e";
+                ctx.strokeStyle = this.color;
                 ctx.lineWidth = 3;
-                ctx.shadowColor = "#fdcb6e";
+                ctx.shadowColor = this.color;
                 ctx.shadowBlur = 10;
                 for (let segment of this.segments) {
                     ctx.beginPath();
@@ -1223,9 +1265,12 @@
                 } else {
                     this.speed = this.originalSpeed;
                 }
-                if (this.poisoned > 0) {
-                    this.poisoned -= gameState.speedMultiplier;
-                    if (this.poisoned % 30 < gameState.speedMultiplier) {
+                if (this.poisoned > 0 || this.poisoned === -1) {
+                    if (this.poisoned > 0) {
+                        this.poisoned -= gameState.speedMultiplier;
+                    }
+                    // Permanent poison (-1) ticks every 30 frames; limited poison also ticks
+                    if (this.poisoned === -1 || this.poisoned % 30 < gameState.speedMultiplier) {
                         this.health -= this.poisonDamage;
                         for (let i = 0; i < 3; i++) {
                             gameState.particles.push(new Particle(
@@ -1275,7 +1320,11 @@
                 } else if (special === "chain") {
                     this.stunned = 30;
                 } else if (special === "poison") {
-                    this.poisoned = Math.max(this.poisoned, poisonDuration);
+                    if (poisonDuration === -1 || this.poisoned === -1) {
+                        this.poisoned = -1; // permanent takes precedence
+                    } else {
+                        this.poisoned = Math.max(this.poisoned, poisonDuration);
+                    }
                     this.poisonDamage = Math.max(this.poisonDamage, poisonDamage);
                 }
                 if (this.health <= 0) {
@@ -1298,10 +1347,7 @@
                 updateUI();
                 if (gameState.lives <= 0) {
                     if (gameState.endlessMode) {
-                        if (gameState.bossTowerDestroyTimer) {
-                            clearInterval(gameState.bossTowerDestroyTimer);
-                            gameState.bossTowerDestroyTimer = null;
-                        }
+                        
                         showCelebrationScreen(gameState.wave);
                     } else {
                         alert("Game Over! You defended for " + gameState.wave + " waves across " + gameState.level + " levels!");
@@ -2088,6 +2134,13 @@
             gameState.gold = savedGold;
             gameState.lives = savedLives;
             gameState.livesLostThisLevel = 0;
+            gameState.spellCooldownEnd = 0;
+            gameState.spellActive = false;
+            if (gameState.spellTimer) {
+                clearInterval(gameState.spellTimer);
+                clearTimeout(gameState.spellTimer);
+                gameState.spellTimer = null;
+            }
             showUnlockMessage("🗺️ " + currentTheme.name.toUpperCase() + " - LEVEL " + gameState.level + "! " + currentTheme.description);
             updateUI();
             updateTowerControls();
@@ -2198,63 +2251,12 @@
             document.body.appendChild(overlay);
         }
 
-        function startBossTowerDestroyTimer() {
-            if (gameState.bossTowerDestroyTimer) {
-                clearInterval(gameState.bossTowerDestroyTimer);
-            }
-            gameState.bossTowerDestroyTimer = setInterval(() => {
-                if (!gameState.gameRunning || gameState.paused || gameState.towers.length === 0) return;
-                const randomTower = gameState.towers[Math.floor(Math.random() * gameState.towers.length)];
-                if (!randomTower) return;
-                if (randomTower.level > 1) {
-                    randomTower.level--;
-                    const baseStats = towerTypes[randomTower.type];
-                    const multiplier = 1 + (randomTower.level - 1) * 0.5;
-                    randomTower.stats.damage = Math.floor(baseStats.damage * multiplier);
-                    randomTower.stats.range = Math.floor(baseStats.range * (1 + (randomTower.level - 1) * 0.3));
-                    randomTower.stats.fireRate = Math.floor(baseStats.fireRate * (1 - (randomTower.level - 1) * 0.2));
-                    for (let i = 0; i < 5; i++) {
-                        gameState.particles.push(new Particle(
-                            randomTower.x + (Math.random() - 0.5) * 20,
-                            randomTower.y + (Math.random() - 0.5) * 20,
-                            (Math.random() - 0.5) * 3,
-                            (Math.random() - 0.5) * 3,
-                            "#e74c3c"
-                        ));
-                    }
-                    const notif = document.createElement("div");
-                    notif.textContent = "⚠️ " + randomTower.type.toUpperCase() + " downgraded to Level " + randomTower.level + "!";
-                    notif.style.cssText = "position:fixed;top:20%;left:50%;transform:translateX(-50%);background:rgba(231,76,60,0.9);color:white;padding:10px 20px;border-radius:8px;font-weight:bold;z-index:1500;animation:floatUp 2s ease-out forwards;";
-                    document.body.appendChild(notif);
-                    setTimeout(() => { if (document.body.contains(notif)) document.body.removeChild(notif); }, 2000);
-                } else {
-                    const index = gameState.towers.indexOf(randomTower);
-                    if (index > -1) {
-                        gameState.towers.splice(index, 1);
-                    }
-                    for (let i = 0; i < 15; i++) {
-                        gameState.particles.push(new Particle(
-                            randomTower.x, randomTower.y,
-                            Math.random() * 6 - 3,
-                            Math.random() * 6 - 3,
-                            "#e74c3c"
-                        ));
-                    }
-                    const notif = document.createElement("div");
-                    notif.textContent = "💥 " + randomTower.type.toUpperCase() + " destroyed by the Boss!";
-                    notif.style.cssText = "position:fixed;top:20%;left:50%;transform:translateX(-50%);background:rgba(231,76,60,0.9);color:white;padding:10px 20px;border-radius:8px;font-weight:bold;z-index:1500;animation:floatUp 2s ease-out forwards;";
-                    document.body.appendChild(notif);
-                    setTimeout(() => { if (document.body.contains(notif)) document.body.removeChild(notif); }, 2000);
-                }
-                if (gameState.selectedPlacedTower && !gameState.towers.includes(gameState.selectedPlacedTower)) {
-                    gameState.selectedPlacedTower = null;
-                    updateTowerControls();
-                }
-            }, 5000);
-        }
+
 
         function startWave() {
             if (gameState.waveInProgress) return;
+            gameState.selectedTower = null;
+            updateTowerButtons();
             updateTowerUI();
             gameState.waveInProgress = true;
             gameState.enemiesSpawned = 0;
@@ -2306,9 +2308,7 @@
                     if (gameState.speedMultiplier === 4) unlockAchievement("speedDemon");
                     updateUI();
                     if (isBossWave) {
-                        if (gameState.level === 5 || gameState.endlessMode) {
-                            startBossTowerDestroyTimer();
-                        }
+                        
                         if (!gameState.endlessMode) {
                             setTimeout(() => { advanceToNextLevel(); }, 2000);
                         }
@@ -2397,10 +2397,7 @@
         }
 
         function resetGame() {
-            if (gameState.bossTowerDestroyTimer) {
-                clearInterval(gameState.bossTowerDestroyTimer);
-                gameState.bossTowerDestroyTimer = null;
-            }
+            
             gameState = {
                 gold: currentDiffSettings.startGold,
                 lives: currentDiffSettings.startLives,
@@ -2411,10 +2408,12 @@
                 particles: [], lightningEffects: [],
                 gameRunning: false, paused: false,
                 waveInProgress: false, bossWaveActive: false,
+                spellCooldownEnd: 0,
+                spellActive: false,
+                spellTimer: null,
                 enemiesSpawned: 0, enemiesInWave: 8,
                 speedMultiplier: 1,
                 endlessMode: false, endlessMapIndex: 0,
-                bossTowerDestroyTimer: null,
                 difficulty: currentDifficulty,
                 livesLostThisLevel: 0,
                 totalKills: 0,
@@ -2437,7 +2436,7 @@
             document.getElementById("gold").textContent = gameState.gold;
             document.getElementById("lives").textContent = gameState.lives;
             document.getElementById("wave").textContent = gameState.wave;
-            document.getElementById("waveMax").textContent = 15;
+            document.getElementById("waveMax").textContent = gameState.endlessMode ? "" : "/15";
 
             document.getElementById("level").textContent = gameState.endlessMode ? "ENDLESS" : gameState.level;
             const themeEmoji = {
@@ -2452,6 +2451,7 @@
             if (diffDisplay) {
                 diffDisplay.textContent = currentDiffSettings.emoji + " " + currentDiffSettings.name;
             }
+            updateSpellButton();
         }
 
         function drawPath() {
@@ -2494,6 +2494,236 @@
             ctx.fill();
         }
 
+        // ===== SPELL SYSTEM =====
+        function castSpell() {
+            const spell = currentTheme.spell;
+            if (!spell) return;
+            if (Date.now() < gameState.spellCooldownEnd) return;
+            if (gameState.spellActive) return;
+
+            gameState.spellActive = true;
+            // Cooldown is set immediately for instant spells, after duration for temp spells
+
+            switch (currentTheme.name) {
+                case "Classic":
+                    castBoost();
+                    break;
+                case "Sci-Fi":
+                    castOverdrive();
+                    break;
+                case "Biohazard":
+                    castQuarantine();
+                    break;
+                case "Warzone":
+                    castAirstrike();
+                    break;
+                case "Nexus":
+                    castCosmicStorm();
+                    break;
+            }
+
+            updateSpellButton();
+        }
+
+        function castBoost() {
+            // 2x damage for all towers for 15s, cooldown starts after spell ends
+            gameState.towers.forEach(tower => {
+                tower.stats.damage *= 2;
+            });
+            showUnlockMessage("⚡ BOOST! Towers deal 2x damage for 15s!");
+            gameState.spellTimer = setTimeout(() => {
+                gameState.towers.forEach(tower => {
+                    tower.stats.damage /= 2;
+                });
+                gameState.spellActive = false;
+                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                showUnlockMessage("⚡ Boost ended - cooldown started");
+                updateSpellButton();
+            }, 15000);
+        }
+
+        function castOverdrive() {
+            // 2x fire rate for all towers for 15s, cooldown starts after spell ends
+            gameState.towers.forEach(tower => {
+                tower.stats.fireRate /= 2;
+            });
+            showUnlockMessage("🔋 OVERDRIVE! Towers fire 2x faster for 15s!");
+            gameState.spellTimer = setTimeout(() => {
+                gameState.towers.forEach(tower => {
+                    tower.stats.fireRate *= 2;
+                });
+                gameState.spellActive = false;
+                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                showUnlockMessage("🔋 Overdrive ended - cooldown started");
+                updateSpellButton();
+            }, 15000);
+        }
+
+        function castQuarantine() {
+            // Pause spawning and poison all enemies for 10s, cooldown starts after spell ends
+            const wasInProgress = gameState.waveInProgress;
+            gameState.waveInProgress = false; // pause spawning
+
+            gameState.enemies.forEach(enemy => {
+                enemy.poisoned = 600; // 10 seconds at 60fps
+                enemy.poisonDamage = 5;
+            });
+
+            showUnlockMessage("☣️ QUARANTINE! Spawning paused, all enemies poisoned!");
+
+            // Spawn poison particles continuously for the full duration
+            const particleInterval = setInterval(() => {
+                if (!gameState.gameRunning) {
+                    clearInterval(particleInterval);
+                    return;
+                }
+                gameState.enemies.forEach(enemy => {
+                    if (enemy.poisoned > 0) {
+                        for (let i = 0; i < 3; i++) {
+                            gameState.particles.push(new Particle(
+                                enemy.x + (Math.random() - 0.5) * enemy.size,
+                                enemy.y + (Math.random() - 0.5) * enemy.size,
+                                (Math.random() - 0.5) * 2,
+                                (Math.random() - 0.5) * 2 - 1,
+                                "#00b894"
+                            ));
+                        }
+                    }
+                });
+            }, 100);
+
+            gameState.spellTimer = setTimeout(() => {
+                clearInterval(particleInterval);
+                gameState.waveInProgress = wasInProgress; // resume spawning
+                gameState.spellActive = false;
+                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                showUnlockMessage("☣️ Quarantine ended");
+                updateSpellButton();
+            }, 10000);
+        }
+
+        function castAirstrike() {
+            // Massive damage to all enemies, cooldown starts immediately
+            const damage = 5000;
+            let killed = 0;
+
+            gameState.enemies.forEach(enemy => {
+                enemy.health -= damage;
+                for (let i = 0; i < 10; i++) {
+                    gameState.particles.push(new Particle(
+                        enemy.x, enemy.y,
+                        Math.random() * 8 - 4,
+                        Math.random() * 8 - 4,
+                        "#e74c3c"
+                    ));
+                }
+                if (enemy.health <= 0) {
+                    killed++;
+                    gameState.gold += enemy.reward;
+                    enemy.createDeathParticles();
+                }
+            });
+
+            gameState.enemies = gameState.enemies.filter(e => e.health > 0);
+
+            showUnlockMessage("✈️ AIRSTRIKE! " + killed + " enemies hit!");
+            gameState.spellActive = false;
+            gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown;
+            updateUI();
+            // Cooldown already set in castSpell()
+        }
+
+        function castCosmicStorm() {
+            // Randomly kill enemies with purple lightning until the wave ends
+            showUnlockMessage("🌌 COSMIC STORM! The void hungers until this wave ends...");
+
+            const flash = document.createElement("div");
+            flash.className = "cosmic-flash";
+            document.body.appendChild(flash);
+            setTimeout(() => { if (document.body.contains(flash)) document.body.removeChild(flash); }, 300 / gameState.speedMultiplier);
+
+            // Strike random enemies every 5 seconds until wave ends
+            gameState.spellTimer = setInterval(() => {
+                // End when wave is over
+                if (!gameState.waveInProgress || !gameState.gameRunning) {
+                    clearInterval(gameState.spellTimer);
+                    gameState.spellTimer = null;
+                    gameState.spellActive = false;
+                    gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                    showUnlockMessage("🌌 Cosmic Storm ended - cooldown started");
+                    updateSpellButton();
+                    return;
+                }
+
+                if (gameState.enemies.length === 0) return;
+
+                // Kill exactly 1 enemy per strike
+                const numStrikes = 1;
+                for (let i = 0; i < numStrikes; i++) {
+                    const target = gameState.enemies[Math.floor(Math.random() * gameState.enemies.length)];
+                    if (!target) continue;
+
+                    // Purple lightning effect
+                    gameState.lightningEffects.push(new LightningEffect(
+                        target.x + (Math.random() - 0.5) * 50,
+                        -20,
+                        target.x,
+                        target.y,
+                        "#b64cfd"
+                    ));
+
+                    // Purple explosion particles
+                    for (let j = 0; j < 15; j++) {
+                        gameState.particles.push(new Particle(
+                            target.x, target.y,
+                            Math.random() * 6 - 3,
+                            Math.random() * 6 - 3,
+                            "#b64cfd"
+                        ));
+                    }
+
+                    // Kill the enemy
+                    gameState.gold += target.reward;
+                    target.createDeathParticles();
+                    const idx = gameState.enemies.indexOf(target);
+                    if (idx > -1) gameState.enemies.splice(idx, 1);
+                }
+
+                // Purple screen flash
+                const miniFlash = document.createElement("div");
+                miniFlash.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(182,76,253,0.15);pointer-events:none;z-index:2500;";
+                document.body.appendChild(miniFlash);
+                setTimeout(() => { if (document.body.contains(miniFlash)) document.body.removeChild(miniFlash); }, 100 / gameState.speedMultiplier);
+
+            }, 5000 / gameState.speedMultiplier);
+        }
+
+        function updateSpellButton() {
+            const btn = document.getElementById("spellBtn");
+            if (!btn) return;
+
+            const spell = currentTheme.spell;
+            if (!spell) {
+                btn.style.display = "none";
+                return;
+            }
+
+            btn.style.display = "inline-block";
+            btn.textContent = spell.emoji + " " + spell.name;
+            btn.style.background = "linear-gradient(145deg," + spell.color + "," + spell.color + "aa)";
+
+            const remaining = Math.max(0, gameState.spellCooldownEnd - Date.now());
+            if (remaining > 0) {
+                btn.classList.add("cooldown");
+                btn.disabled = true;
+                const seconds = Math.ceil(remaining / 1000);
+                btn.textContent = spell.emoji + " " + seconds + "s";
+            } else {
+                btn.classList.remove("cooldown");
+                btn.disabled = false;
+            }
+        }
+
         function gameLoop() {
             if (currentTheme.bgImageObj && currentTheme.bgImageObj.complete && currentTheme.bgImageObj.naturalWidth > 0) {
                 ctx.drawImage(currentTheme.bgImageObj, 0, 0, canvas.width, canvas.height);
@@ -2517,6 +2747,7 @@
             drawRangePreview();
             updateUI();
             updateTowerControls();
+            updateSpellButton();
             requestAnimationFrame(gameLoop);
         }
 
