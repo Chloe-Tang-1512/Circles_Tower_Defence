@@ -444,11 +444,6 @@
     </style>
 <base target="_blank">
 <base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
     <div id="mainMenu">
@@ -498,8 +493,8 @@
                 <div class="difficulty-stats">
                     💰 50 Starting Gold<br>
                     ❤️ 20 Lives<br>
-                    🚀 1.15x Enemy Speed<br>
-                    🛡️ 1.15x Enemy Health<br>
+                    🚀 1.25x Enemy Speed<br>
+                    🛡️ 1.25x Enemy Health<br>
                     💵 0.75x Rewards<br>
                     ⏱️ 0.75x Spawn Delay
                 </div>
@@ -510,10 +505,10 @@
                 <div class="difficulty-stats">
                     💰 25 Starting Gold<br>
                     ❤️ 15 Lives<br>
-                    🔋 1.2x Enemy Speed<br>
-                    🛡️ 1.2x Enemy Health<br>
-                    💵 0.7x Rewards<br>
-                    ⏱️ 0.7x Spawn Delay
+                    🔋 1.5x Enemy Speed<br>
+                    🛡️ 1.5x Enemy Health<br>
+                    💵 0.5x Rewards<br>
+                    ⏱️ 0.5x Spawn Delay
                 </div>
             </div>
         </div>
@@ -591,10 +586,9 @@
             <button class="control-btn save-btn" onclick="saveGame()">💾 Save</button>
             <button class="control-btn menu-btn-game" onclick="returnToMenu()">🏠 Menu</button>
             <button class="control-btn" onclick="resetGame()">🔄 Reset</button>
-            <!-- Spell button moved to tower bar -->
         </div>
         <div class="tooltip">
-            Click to place towers • Click towers to upgrade/sell • 🎯 button changes targeting • Boss every 15 waves! • Towers clear every 15 waves, new map! • Electric towers chain lightning! • Poison towers damage over time!
+            Click to place towers • Click towers to upgrade/sell • 🎯 button changes targeting • Boss every 15 waves! • Towers clear every 15 waves, new map! • Electric towers chain lightning! • Poison towers damage over time! • Path traps go ON the path!
         </div>
     </div>
 
@@ -620,23 +614,22 @@
             hard: {
                 name: "Hard", emoji: "🔥",
                 startGold: 50, startLives: 20,
-                enemySpeedMult: 1.15, enemyHealthMult: 1.15,
+                enemySpeedMult: 1.25, enemyHealthMult: 1.25,
                 rewardMult: 0.75, waveGoldBonus: 1.0,
                 enemySpawnDelayMult: 0.75
             },
             insane: {
                 name: "Insane", emoji: "💀",
                 startGold: 25, startLives: 15,
-                enemySpeedMult: 1.2, enemyHealthMult: 1.2,
-                rewardMult: 0.7, waveGoldBonus: 1.0,
-                enemySpawnDelayMult: 0.7
+                enemySpeedMult: 1.5, enemyHealthMult: 1.5,
+                rewardMult: 0.5, waveGoldBonus: 1.0,
+                enemySpawnDelayMult: 0.5
             }
         };
 
         let currentDifficulty = "normal";
         let currentDiffSettings = difficultySettings.normal;
 
-        // ===== ACHIEVEMENTS SYSTEM =====
         const achievements = {
             firstBlood: { id: "firstBlood", name: "First Blood", desc: "Defeat your first enemy", emoji: "🩸", unlocked: false },
             wave5: { id: "wave5", name: "Getting Started", desc: "Reach wave 5", emoji: "🏄", unlocked: false },
@@ -718,10 +711,9 @@
             }
         }
 
-        // Track tower types placed for Arsenal achievement
         let towerTypesPlacedThisGame = new Set();
 
-                const levelThemes = [
+        const levelThemes = [
             {
                 name: "Classic",
                 bgColor: "#3F9B0B",
@@ -738,10 +730,10 @@
                     {x:220,y:340},{x:80,y:340},{x:80,y:470},{x:50,y:470},
                     {x:50,y:570},{x:800,y:570}
                 ],
-                towers: ["cannon","freeze","sniper"],
+                towers: ["cannon","freeze","sniper","spikeTrap"],
                 enemies: ["basic","fast","heavy"],
                 enemyHealthMult: 1.0, enemySpeedMult: 1.0, enemyRewardMult: 1.0,
-                description: "Classic defence - sturdy cannons, chilling freeze, and precise snipers!"
+                description: "Classic defence - sturdy cannons, chilling freeze, precise snipers, and deadly spike traps!"
             },
             {
                 name: "Sci-Fi",
@@ -756,10 +748,10 @@
                     {x:625, y:500}, {x:625, y:100}, {x:775, y:100}, {x:775, y:300},
                     {x:0, y:300}
                 ],
-                towers: ["electric","laser","plasma"],
+                towers: ["electric","laser","plasma","empMine"],
                 enemies: ["basic","flying","armored"],
                 enemyHealthMult: 1.3, enemySpeedMult: 0.9, enemyRewardMult: 1.2,
-                description: "High-tech future warfare - chain lightning, laser beams, and piercing plasma!"
+                description: "High-tech future warfare - chain lightning, laser beams, piercing plasma, and EMP mines!"
             },
             {
                 name: "Biohazard",
@@ -775,10 +767,10 @@
                     {x:600,y:500},{x:400,y:500},{x:400,y:400},{x:200,y:400},
                     {x:200,y:520},{x:50,y:520},{x:50,y:350},{x:800,y:350}
                 ],
-                towers: ["poison","plasma","freeze"],
+                towers: ["poison","plasma","freeze","acidPool"],
                 enemies: ["basic","heavy","flying"],
                 enemyHealthMult: 1.1, enemySpeedMult: 1.1, enemyRewardMult: 1.3,
-                description: "BIOHAZARD ALERT - toxic poison, piercing plasma, and cryo freeze containment!"
+                description: "BIOHAZARD ALERT - toxic poison, piercing plasma, cryo freeze, and bubbling acid pools!"
             },
             {
                 name: "Warzone",
@@ -794,10 +786,10 @@
                     {x:400,y:150},{x:200,y:150},{x:200,y:300},{x:50,y:300},
                     {x:50,y:500},{x:800,y:500}
                 ],
-                towers: ["missile","sniper","piat"],
+                towers: ["missile","sniper","piat","mine"],
                 enemies: ["basic","heavy","armored"],
                 enemyHealthMult: 1.5, enemySpeedMult: 1.0, enemyRewardMult: 1.5,
-                description: "Heavy modern warfare - explosive missiles, precise snipers, and armor-breaking PIATs!"
+                description: "Heavy modern warfare - explosive missiles, precise snipers, armor-breaking PIATs, and land mines!"
             },
             {
                 name: "Nexus",
@@ -812,10 +804,10 @@
                     {x:450,y:450},{x:650,y:450},{x:650,y:250},{x:450,y:250},
                     {x:450,y:100},{x:800,y:100}
                 ],
-                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat"],
+                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat","voidRift"],
                 enemies: ["basic","fast","heavy","armored","flying"],
                 enemyHealthMult: 1.8, enemySpeedMult: 1.1, enemyRewardMult: 2.0,
-                description: "The ultimate level - ALL towers available!"
+                description: "The ultimate level - ALL towers and the reality-tearing Void Rift!"
             }
         ];
 
@@ -837,7 +829,6 @@
         let path = currentTheme.path;
         let mouseX = 0, mouseY = 0;
 
-        // Preload background images
         levelThemes.forEach(theme => {
             if (theme.bgImage) {
                 const img = new Image();
@@ -846,7 +837,6 @@
             }
         });
 
-        // ===== SAVE / LOAD SYSTEM =====
         function serializeGameState() {
             const saveData = {
                 v: 1,
@@ -857,9 +847,11 @@
                 lv: gameState.level,
                 em: gameState.endlessMode,
                 emi: gameState.endlessMapIndex,
-                t: gameState.towers.map(t => [
-                    Math.round(t.x), Math.round(t.y), t.type, t.level, t.totalCost
-                ]),
+                t: gameState.towers.map(t => {
+                    const base = [Math.round(t.x), Math.round(t.y), t.type, t.level, t.totalCost];
+                    if (t.stats.pathPlaceable && t.life) base.push(Math.round(t.life));
+                    return base;
+                }),
                 tm: gameState.targetMode,
                 ti: levelThemes.indexOf(currentTheme)
             };
@@ -940,8 +932,6 @@
             currentDifficulty = saveData.d;
             currentDiffSettings = difficultySettings[currentDifficulty];
 
-            
-
             gameState = {
                 gold: saveData.g || currentDiffSettings.startGold,
                 lives: saveData.l || currentDiffSettings.startLives,
@@ -978,7 +968,7 @@
                 const selectedTheme = levelThemes[gameState.endlessMapIndex];
                 currentTheme = {
                     ...selectedTheme,
-                    towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat"],
+                    towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat","voidRift"],
                     enemies: ["basic","fast","heavy","armored","flying"]
                 };
             } else {
@@ -993,6 +983,9 @@
                         const tower = new Tower(x, y, type);
                         tower.level = level;
                         tower.totalCost = totalCost || towerTypes[type].cost;
+                        if (tData.length > 5 && tower.stats.pathPlaceable) {
+                            tower.life = tData[5];
+                        }
                         const baseStats = towerTypes[type];
                         const multiplier = 1 + (level - 1) * 0.5;
                         tower.stats.damage = Math.floor(baseStats.damage * multiplier);
@@ -1028,7 +1021,6 @@
             showUnlockMessage("📂 Game Loaded! " + currentDiffSettings.emoji + " " + currentDiffSettings.name + " - Wave " + gameState.wave);
         }
 
-        // ===== MENU NAVIGATION =====
         function showDifficultyScreen() {
             document.getElementById("mainMenu").classList.add("hidden");
             document.getElementById("difficultyScreen").classList.add("active");
@@ -1057,8 +1049,6 @@
 
         function startNewGame() {
             currentDiffSettings = difficultySettings[currentDifficulty];
-
-            
 
             gameState = {
                 gold: currentDiffSettings.startGold,
@@ -1112,13 +1102,11 @@
         }
 
         function returnToMenu() {
-            
             gameState.paused = true;
             document.getElementById("gameContainer").classList.remove("active");
             document.getElementById("mainMenu").classList.remove("hidden");
         }
 
-        // ===== CHEAT CODES =====
         let cheatBuffer = "";
         let cheatTimeout = null;
         const cheatCodes = {
@@ -1167,9 +1155,15 @@
                 if (cheatBuffer.length > 20) cheatBuffer = cheatBuffer.slice(-15);
             }
         }
-        document.addEventListener("keydown", handleCheatInput);
+        document.addEventListener("keydown", function(e) {
+            if (e.code === "Space" && document.getElementById("gameContainer").classList.contains("active")) {
+                e.preventDefault();
+                togglePause();
+                return;
+            }
+            handleCheatInput(e);
+        });
 
-        // Tower types
         const towerTypes = {
             cannon: { cost: 25, damage: 20, range: 90, fireRate: 900, color: "#e74c3c", projectileSpeed: 4, size: 20, accuracy: 0.7, unlocked: true },
             laser: { cost: 45, damage: 12, range: 130, fireRate: 350, color: "#3498db", projectileSpeed: 6, size: 18, accuracy: 1.0, unlocked: true },
@@ -1179,10 +1173,14 @@
             freeze: { cost: 90, damage: 5, range: 100, fireRate: 800, color: "#74b9ff", projectileSpeed: 5, size: 18, special: "freeze", accuracy: 0.4, unlocked: false, unlockWave: 20 },
             plasma: { cost: 150, damage: 60, range: 120, fireRate: 1200, color: "#a29bfe", projectileSpeed: 7, size: 20, piercing: true, accuracy: 0.8, unlocked: false, unlockWave: 30 },
             electric: { cost: 110, damage: 25, range: 100, fireRate: 1000, color: "#fdcb6e", projectileSpeed: 8, size: 19, special: "chain", chainRange: 60, maxChains: 3, accuracy: 0.9, unlocked: false, unlockWave: 35 },
-            piat: { cost: 150, damage: 5000, range: 125, fireRate: 5000, color: "#6c5ce7", projectileSpeed: 3, size: 22, aoe: true, aoeRadius: 40, accuracy: 0.9, armorBreak: true, unlocked: false, unlockWave: 15 }
+            piat: { cost: 150, damage: 5000, range: 125, fireRate: 5000, color: "#6c5ce7", projectileSpeed: 3, size: 22, aoe: true, aoeRadius: 40, accuracy: 0.9, armorBreak: true, unlocked: false, unlockWave: 15 },
+            mine: { cost: 20, damage: 100, range: 0, fireRate: 999999, color: "#c0392b", projectileSpeed: 0, size: 10, pathPlaceable: true, aoe: true, aoeRadius: 50, accuracy: 1.0, unlocked: true },
+            acidPool: { cost: 15, damage: 75, range: 0, fireRate: 999999, color: "#00b894", projectileSpeed: 0, size: 20, pathPlaceable: true, special: "acid", poisonDamage: 5, poisonDuration: 180, poolDuration: 600, accuracy: 1.0, unlocked: true },
+            spikeTrap: { cost: 5, damage: 25, range: 0, fireRate: 999999, color: "#8b4513", projectileSpeed: 0, size: 14, pathPlaceable: true, aoe: true, aoeRadius: 25, accuracy: 1.0, rechargeTime: 90, unlocked: true },
+            empMine: { cost: 10, damage: 50, range: 0, fireRate: 999999, color: "#00ffff", projectileSpeed: 0, size: 12, pathPlaceable: true, aoe: true, aoeRadius: 55, special: "emp", stunDuration: 90, accuracy: 1.0, unlocked: true },
+            voidRift: { cost: 25, damage: 125, range: 0, fireRate: 999999, color: "#b64cfd", projectileSpeed: 0, size: 25, pathPlaceable: true, special: "void", slowFactor: 0.5, poolDuration: 480, accuracy: 1.0, unlocked: true }
         };
 
-        // Enemy types
         const enemyTypes = {
             basic: { health: 1, speed: 1, reward: 1, color: "#e74c3c", size: 15, unlocked: true },
             fast: { health: 0.7, speed: 1.8, reward: 1.2, color: "#f39c12", size: 12, unlocked: false, unlockWave: 5 },
@@ -1192,7 +1190,6 @@
             boss: { health: 8, speed: 0.4, reward: 2.5, color: "#c0392b", size: 30, unlocked: false, unlockWave: 15 }
         };
 
-        // Lightning Effect class
         class LightningEffect {
             constructor(x1, y1, x2, y2, color) {
                 this.x1 = x1; this.y1 = y1;
@@ -1249,7 +1246,6 @@
             }
         }
 
-        // Enemy class
         class Enemy {
             constructor(type = "basic") {
                 this.type = type;
@@ -1275,6 +1271,8 @@
                 this.frozen = 0;
                 this.originalSpeed = this.speed;
                 this.stunned = 0;
+                this.slowed = 0;
+                this.slowFactor = 1.0;
                 this.poisoned = 0;
                 this.poisonDamage = 0;
             }
@@ -1285,6 +1283,9 @@
                 } else if (this.stunned > 0) {
                     this.stunned -= gameState.speedMultiplier;
                     this.speed = this.originalSpeed * 0.1;
+                } else if (this.slowed > 0) {
+                    this.slowed -= gameState.speedMultiplier;
+                    this.speed = this.originalSpeed * this.slowFactor;
                 } else {
                     this.speed = this.originalSpeed;
                 }
@@ -1292,7 +1293,6 @@
                     if (this.poisoned > 0) {
                         this.poisoned -= gameState.speedMultiplier;
                     }
-                    // Permanent poison (-1) ticks every 30 frames; limited poison also ticks
                     if (this.poisoned === -1 || this.poisoned % 30 < gameState.speedMultiplier) {
                         this.health -= this.poisonDamage;
                         for (let i = 0; i < 3; i++) {
@@ -1344,7 +1344,7 @@
                     this.stunned = 30;
                 } else if (special === "poison") {
                     if (poisonDuration === -1 || this.poisoned === -1) {
-                        this.poisoned = -1; // permanent takes precedence
+                        this.poisoned = -1;
                     } else {
                         this.poisoned = Math.max(this.poisoned, poisonDuration);
                     }
@@ -1370,7 +1370,6 @@
                 updateUI();
                 if (gameState.lives <= 0) {
                     if (gameState.endlessMode) {
-                        
                         showCelebrationScreen(gameState.wave);
                     } else {
                         alert("Game Over! You defended for " + gameState.wave + " waves across " + gameState.level + " levels!");
@@ -1435,7 +1434,6 @@
                     ctx.beginPath();
                     ctx.arc(this.x, drawY, this.size - 2, 0, Math.PI * 2);
                     ctx.stroke();
-                    // Armor shield icon
                     ctx.fillStyle = "#34495e";
                     ctx.font = "bold 10px Arial";
                     ctx.textAlign = "center";
@@ -1469,7 +1467,6 @@
             }
         }
 
-        // Tower class
         class Tower {
             constructor(x, y, type) {
                 this.x = x; this.y = y; this.type = type;
@@ -1479,8 +1476,13 @@
                 this.lastFire = 0;
                 this.target = null;
                 this.angle = 0;
+                this.dead = false;
+                this.triggered = false;
+                this.life = this.stats.poolDuration || 0;
+                this.rechargeTimer = 0;
             }
             upgrade() {
+                if (this.stats.pathPlaceable) return false;
                 if (this.level >= 3) return false;
                 const upgradeCost = this.getUpgradeCost();
                 if (gameState.gold < upgradeCost) return false;
@@ -1499,7 +1501,6 @@
                     this.stats.poisonDamage = Math.floor(baseStats.poisonDamage * (1 + (this.level - 1) * 0.5));
                     this.stats.poisonDuration = Math.floor(baseStats.poisonDuration * (1 + (this.level - 1) * 0.3));
                 }
-                // Accuracy improves with each upgrade (capped at 1.0)
                 this.stats.accuracy = Math.min(1.0, baseStats.accuracy + (this.level - 1) * 0.15);
                 if (this.level === 3) {
                     unlockAchievement("maxUpgrade");
@@ -1513,16 +1514,224 @@
                 return Math.floor(this.totalCost * 0.6);
             }
             update() {
+                if (this.stats.pathPlaceable) {
+                    this.updateTrap();
+                    return;
+                }
                 this.findTarget();
                 if (this.target && Date.now() - this.lastFire > this.stats.fireRate / gameState.speedMultiplier) {
                     this.fire();
                     this.lastFire = Date.now();
                 }
             }
+            updateTrap() {
+                if (this.type === "mine") {
+                    if (this.triggered || this.dead) return;
+                    for (let enemy of gameState.enemies) {
+                        if (enemy.flying) continue;
+                        const dist = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                        if (dist < this.stats.size + enemy.size + 2) {
+                            this.explodeMine();
+                            return;
+                        }
+                    }
+                } else if (this.type === "acidPool") {
+                    this.life -= gameState.speedMultiplier;
+                    if (this.life <= 0) {
+                        this.dead = true;
+                        for (let i = 0; i < 20; i++) {
+                            gameState.particles.push(new Particle(
+                                this.x + (Math.random() - 0.5) * this.stats.size * 2,
+                                this.y + (Math.random() - 0.5) * this.stats.size * 2,
+                                (Math.random() - 0.5) * 3,
+                                (Math.random() - 0.5) * 3 - 1,
+                                "#00b894"
+                            ));
+                        }
+                        return;
+                    }
+                    for (let enemy of gameState.enemies) {
+                        if (enemy.flying) continue;
+                        const dist = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                        if (dist < this.stats.size + enemy.size) {
+                            if (this.life % 15 < gameState.speedMultiplier) {
+                                enemy.health -= this.stats.damage;
+                                if (enemy.poisoned !== -1) {
+                                    enemy.poisoned = Math.max(enemy.poisoned, this.stats.poisonDuration);
+                                }
+                                enemy.poisonDamage = Math.max(enemy.poisonDamage, this.stats.poisonDamage);
+                                for (let i = 0; i < 2; i++) {
+                                    gameState.particles.push(new Particle(
+                                        enemy.x + (Math.random() - 0.5) * enemy.size,
+                                        enemy.y + (Math.random() - 0.5) * enemy.size,
+                                        (Math.random() - 0.5) * 2,
+                                        (Math.random() - 0.5) * 2 - 1,
+                                        "#00b894"
+                                    ));
+                                }
+                                if (enemy.health <= 0) {
+                                    gameState.gold += enemy.reward;
+                                    enemy.createDeathParticles();
+                                    unlockAchievement("firstBlood");
+                                    gameState.totalKills++;
+                                    if (gameState.totalKills >= 100) unlockAchievement("kill100");
+                                    const index = gameState.enemies.indexOf(enemy);
+                                    if (index > -1) gameState.enemies.splice(index, 1);
+                                }
+                            }
+                        }
+                    }
+                } else if (this.type === "spikeTrap") {
+                    if (this.rechargeTimer > 0) {
+                        this.rechargeTimer -= gameState.speedMultiplier;
+                        return;
+                    }
+                    let triggered = false;
+                    for (let enemy of gameState.enemies) {
+                        if (enemy.flying) continue;
+                        const dist = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                        if (dist < this.stats.aoeRadius) {
+                            triggered = true;
+                            break;
+                        }
+                    }
+                    if (triggered) {
+                        for (let enemy of gameState.enemies) {
+                            if (enemy.flying) continue;
+                            const dist = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                            if (dist < this.stats.aoeRadius) {
+                                if (enemy.takeDamage(this.stats.damage, null)) {
+                                    const index = gameState.enemies.indexOf(enemy);
+                                    if (index > -1) gameState.enemies.splice(index, 1);
+                                }
+                            }
+                        }
+                        for (let i = 0; i < 12; i++) {
+                            gameState.particles.push(new Particle(
+                                this.x, this.y,
+                                Math.random() * 4 - 2,
+                                Math.random() * 6 - 3,
+                                "#8b4513"
+                            ));
+                        }
+                        this.rechargeTimer = this.stats.rechargeTime;
+                    }
+                } else if (this.type === "empMine") {
+                    if (this.triggered || this.dead) return;
+                    for (let enemy of gameState.enemies) {
+                        if (enemy.flying) continue;
+                        const dist = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                        if (dist < this.stats.size + enemy.size + 2) {
+                            this.triggered = true;
+                            this.dead = true;
+                            for (let enemy of gameState.enemies) {
+                                if (enemy.flying) continue;
+                                const dist2 = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                                if (dist2 < this.stats.aoeRadius) {
+                                    enemy.health -= this.stats.damage;
+                                    enemy.stunned = this.stats.stunDuration;
+                                    for (let i = 0; i < 5; i++) {
+                                        gameState.particles.push(new Particle(
+                                            enemy.x, enemy.y,
+                                            Math.random() * 3 - 1.5,
+                                            Math.random() * 3 - 1.5,
+                                            "#00ffff"
+                                        ));
+                                    }
+                                    if (enemy.health <= 0) {
+                                        gameState.gold += enemy.reward;
+                                        enemy.createDeathParticles();
+                                        unlockAchievement("firstBlood");
+                                        gameState.totalKills++;
+                                        if (gameState.totalKills >= 100) unlockAchievement("kill100");
+                                        const index = gameState.enemies.indexOf(enemy);
+                                        if (index > -1) gameState.enemies.splice(index, 1);
+                                    }
+                                }
+                            }
+                            for (let i = 0; i < 20; i++) {
+                                gameState.particles.push(new Particle(
+                                    this.x, this.y,
+                                    Math.random() * 8 - 4,
+                                    Math.random() * 8 - 4,
+                                    "#00ffff"
+                                ));
+                            }
+                            return;
+                        }
+                    }
+                } else if (this.type === "voidRift") {
+                    this.life -= gameState.speedMultiplier;
+                    if (this.life <= 0) {
+                        this.dead = true;
+                        for (let i = 0; i < 30; i++) {
+                            gameState.particles.push(new Particle(
+                                this.x + (Math.random() - 0.5) * this.stats.size * 2,
+                                this.y + (Math.random() - 0.5) * this.stats.size * 2,
+                                (Math.random() - 0.5) * 4,
+                                (Math.random() - 0.5) * 4 - 2,
+                                "#b64cfd"
+                            ));
+                        }
+                        return;
+                    }
+                    for (let enemy of gameState.enemies) {
+                        const dist = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                        if (dist < this.stats.size + enemy.size + 5) {
+                            if (this.life % 10 < gameState.speedMultiplier) {
+                                enemy.health -= this.stats.damage;
+                                enemy.slowed = 30;
+                                enemy.slowFactor = this.stats.slowFactor;
+                                for (let i = 0; i < 3; i++) {
+                                    gameState.particles.push(new Particle(
+                                        enemy.x + (Math.random() - 0.5) * enemy.size,
+                                        enemy.y + (Math.random() - 0.5) * enemy.size,
+                                        (Math.random() - 0.5) * 2,
+                                        (Math.random() - 0.5) * 2 - 1,
+                                        "#b64cfd"
+                                    ));
+                                }
+                                if (enemy.health <= 0) {
+                                    gameState.gold += enemy.reward;
+                                    enemy.createDeathParticles();
+                                    unlockAchievement("firstBlood");
+                                    gameState.totalKills++;
+                                    if (gameState.totalKills >= 100) unlockAchievement("kill100");
+                                    const index = gameState.enemies.indexOf(enemy);
+                                    if (index > -1) gameState.enemies.splice(index, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            explodeMine() {
+                this.triggered = true;
+                this.dead = true;
+                for (let enemy of gameState.enemies) {
+                    const dist = Math.sqrt(Math.pow(enemy.x - this.x, 2) + Math.pow(enemy.y - this.y, 2));
+                    if (dist < this.stats.aoeRadius) {
+                        if (enemy.flying) continue;
+                        let damage = this.stats.damage;
+                        if (enemy.type !== "boss" && enemy.type !== "armored") {
+                            damage = 99999;
+                        }
+                        if (enemy.takeDamage(damage, null)) {
+                            const index = gameState.enemies.indexOf(enemy);
+                            if (index > -1) gameState.enemies.splice(index, 1);
+                        }
+                    }
+                }
+                for (let i = 0; i < 25; i++) {
+                    gameState.particles.push(new Particle(this.x, this.y, Math.random() * 8 - 4, Math.random() * 8 - 4, "#e74c3c"));
+                }
+                for (let i = 0; i < 10; i++) {
+                    gameState.particles.push(new Particle(this.x, this.y, Math.random() * 6 - 3, Math.random() * 6 - 3, "#f39c12"));
+                }
+            }
             findTarget() {
                 let bestTarget = null;
                 let bestScore = null;
-                // PIAT always targets highest HP enemy, ignoring global targetMode
                 const mode = this.type === "piat" ? "highestHealth" : (gameState.targetMode || "furthest");
                 for (let enemy of gameState.enemies) {
                     const dist = Math.sqrt(
@@ -1647,6 +1856,10 @@
             }
             draw() {
                 const isSelected = gameState.selectedPlacedTower === this;
+                if (this.stats.pathPlaceable) {
+                    this.drawTrap(isSelected);
+                    return;
+                }
                 ctx.fillStyle = isSelected ? "#f39c12" : "#34495e";
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.stats.size + 5, 0, Math.PI * 2);
@@ -1755,9 +1968,170 @@
                     }
                 }
             }
+            drawTrap(isSelected) {
+                if (this.type === "mine") {
+                    ctx.fillStyle = this.triggered ? "#7f8c8d" : "#c0392b";
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (!this.triggered) {
+                        ctx.strokeStyle = "#e74c3c";
+                        ctx.lineWidth = 2;
+                        for (let i = 0; i < 8; i++) {
+                            const angle = (i / 8) * Math.PI * 2 + Date.now() * 0.002;
+                            ctx.beginPath();
+                            ctx.moveTo(this.x + Math.cos(angle) * this.stats.size * 0.6, this.y + Math.sin(angle) * this.stats.size * 0.6);
+                            ctx.lineTo(this.x + Math.cos(angle) * this.stats.size * 1.3, this.y + Math.sin(angle) * this.stats.size * 1.3);
+                            ctx.stroke();
+                        }
+                        const pulse = 0.5 + Math.sin(Date.now() * 0.01) * 0.3;
+                        ctx.fillStyle = `rgba(231, 76, 60, ${pulse * 0.3})`;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.stats.size * 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 10px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText("💀", this.x, this.y + 4);
+                } else if (this.type === "acidPool") {
+                    const lifeRatio = this.life / this.stats.poolDuration;
+                    ctx.fillStyle = `rgba(0, 184, 148, ${0.4 + lifeRatio * 0.4})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size * (0.8 + Math.sin(Date.now() * 0.003) * 0.1), 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = `rgba(0, 255, 150, ${lifeRatio * 0.8})`;
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (Date.now() * 0.001 + i * 1.256) % (Math.PI * 2);
+                        const dist = (i % 2 === 0 ? this.stats.size * 0.5 : this.stats.size * 0.3) + Math.sin(Date.now() * 0.005 + i) * 3;
+                        const bubbleSize = 2 + Math.sin(Date.now() * 0.01 + i * 2) * 1;
+                        ctx.beginPath();
+                        ctx.arc(this.x + Math.cos(angle) * dist, this.y + Math.sin(angle) * dist, bubbleSize, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.strokeStyle = `rgba(0, 184, 148, ${lifeRatio * 0.6})`;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]);
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size + 2 + Math.sin(Date.now() * 0.005) * 2, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 12px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText("☠️", this.x, this.y + 4);
+                } else if (this.type === "spikeTrap") {
+                    const ready = this.rechargeTimer <= 0;
+                    ctx.fillStyle = ready ? "#8b4513" : "#5d4037";
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (ready) {
+                        ctx.fillStyle = "#d4a373";
+                        for (let i = 0; i < 5; i++) {
+                            const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
+                            const spikeLen = this.stats.size * 1.2;
+                            ctx.beginPath();
+                            ctx.moveTo(this.x, this.y);
+                            ctx.lineTo(this.x + Math.cos(angle) * spikeLen, this.y + Math.sin(angle) * spikeLen);
+                            ctx.lineWidth = 3;
+                            ctx.strokeStyle = "#d4a373";
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.arc(this.x + Math.cos(angle) * spikeLen, this.y + Math.sin(angle) * spikeLen, 2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        const pulse = 0.4 + Math.sin(Date.now() * 0.015) * 0.2;
+                        ctx.fillStyle = `rgba(212, 163, 115, ${pulse * 0.3})`;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.stats.size * 1.8, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = "rgba(255,255,255,0.3)";
+                        ctx.font = "10px Arial";
+                        ctx.textAlign = "center";
+                        ctx.fillText(Math.ceil(this.rechargeTimer / 60) + "s", this.x, this.y + 4);
+                    }
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 10px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText(ready ? "🪤" : "🔒", this.x, this.y - this.stats.size - 6);
+                } else if (this.type === "empMine") {
+                    ctx.fillStyle = this.triggered ? "#7f8c8d" : "#00ced1";
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (!this.triggered) {
+                        ctx.strokeStyle = "#00ffff";
+                        ctx.lineWidth = 2;
+                        ctx.shadowColor = "#00ffff";
+                        ctx.shadowBlur = 8;
+                        ctx.setLineDash([2, 2]);
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.stats.size + 3 + Math.sin(Date.now() * 0.01) * 2, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                        ctx.shadowBlur = 0;
+                        const pulse = 0.5 + Math.sin(Date.now() * 0.008) * 0.3;
+                        ctx.fillStyle = `rgba(0, 255, 255, ${pulse * 0.25})`;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.stats.size * 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 10px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText("⚡", this.x, this.y + 4);
+                } else if (this.type === "voidRift") {
+                    const lifeRatio = this.life / this.stats.poolDuration;
+                    ctx.fillStyle = `rgba(182, 76, 253, ${0.3 + lifeRatio * 0.3})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size * (0.9 + Math.sin(Date.now() * 0.004) * 0.1), 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = `rgba(182, 76, 253, ${lifeRatio * 0.8})`;
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = "#b64cfd";
+                    ctx.shadowBlur = 15;
+                    for (let i = 0; i < 3; i++) {
+                        const angle = (Date.now() * 0.002 + i * Math.PI * 2 / 3) % (Math.PI * 2);
+                        const r = this.stats.size * (0.6 + Math.sin(Date.now() * 0.003 + i) * 0.2);
+                        ctx.beginPath();
+                        ctx.arc(this.x + Math.cos(angle) * r, this.y + Math.sin(angle) * r, 3, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${lifeRatio * 0.5})`;
+                    for (let i = 0; i < 6; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const dist = Math.random() * this.stats.size * 0.7;
+                        ctx.beginPath();
+                        ctx.arc(this.x + Math.cos(angle) * dist, this.y + Math.sin(angle) * dist, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.strokeStyle = `rgba(182, 76, 253, ${lifeRatio * 0.5})`;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size + 3 + Math.sin(Date.now() * 0.006) * 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 14px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText("🌌", this.x, this.y + 5);
+                }
+                if (isSelected) {
+                    ctx.strokeStyle = "rgba(255,255,255,0.5)";
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.stats.size + 10, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
         }
 
-        // Projectile class
         class Projectile {
             constructor(x, y, target, stats, type) {
                 this.x = x; this.y = y;
@@ -1771,7 +2145,6 @@
                 this.piercing = stats.piercing;
                 this.size = 4;
                 this.pierced = [];
-                // Calculate aim direction with accuracy-based leading
                 let aimX = target.x;
                 let aimY = target.y;
                 const accuracy = stats.accuracy || 0;
@@ -1836,7 +2209,6 @@
                             Math.pow(enemy.y - this.y, 2)
                         );
                         if (dist < this.aoeRadius) {
-                            // PIAT armor break: enemies in blast lose their armor
                             if (this.type === "piat" && enemy.armor > 0) {
                                 enemy.armor = 0;
                                 for (let i = 0; i < 5; i++) {
@@ -1909,7 +2281,6 @@
             }
         }
 
-        // Particle class
         class Particle {
             constructor(x, y, vx, vy, color) {
                 this.x = x; this.y = y;
@@ -1937,7 +2308,6 @@
             }
         }
 
-        // ===== GAME FUNCTIONS =====
         function selectTower(type) {
             gameState.selectedTower = gameState.selectedTower === type ? null : type;
             gameState.selectedPlacedTower = null;
@@ -1995,11 +2365,25 @@
                     extraInfo = " | Poison: " + tower.stats.poisonDamage + "/tick for " + Math.floor(tower.stats.poisonDuration / 60) + "s";
                 } else if (tower.type === "piat") {
                     extraInfo = " | 💥 Armor Break AoE";
+                } else if (tower.type === "mine") {
+                    extraInfo = " | 💥 Path Trap - explodes on contact";
+                } else if (tower.type === "acidPool") {
+                    extraInfo = " | ☣️ Path Trap - poisons enemies | Duration: " + Math.floor(tower.life / 60) + "s";
+                } else if (tower.type === "spikeTrap") {
+                    extraInfo = " | 🪤 Path Trap - spikes enemies | Recharge: " + (tower.rechargeTimer > 0 ? Math.ceil(tower.rechargeTimer / 60) + "s" : "Ready");
+                } else if (tower.type === "empMine") {
+                    extraInfo = " | ⚡ Path Trap - EMP stun blast";
+                } else if (tower.type === "voidRift") {
+                    extraInfo = " | 🌌 Path Trap - void slow & damage | Duration: " + Math.floor(tower.life / 60) + "s";
                 }
                 const accPercent = Math.round((tower.stats.accuracy || 0) * 100);
-                const infoName = tower.type === "piat" ? "PIAT" : tower.type.toUpperCase();
-                towerInfo.innerHTML = "<strong>" + infoName + " Tower (Level " + tower.level + ")</strong><br>Damage: " + tower.stats.damage + " | Range: " + tower.stats.range + " | Fire Rate: " + (1000 / tower.stats.fireRate).toFixed(1) + "/s | Accuracy: " + accPercent + "%" + extraInfo;
-                if (tower.level >= 3) {
+                const infoName = tower.type === "piat" ? "PIAT" : tower.type === "acidPool" ? "Acid Pool" : tower.type === "mine" ? "Mine" : tower.type === "spikeTrap" ? "Spike Trap" : tower.type === "empMine" ? "EMP Mine" : tower.type === "voidRift" ? "Void Rift" : tower.type.toUpperCase();
+                towerInfo.innerHTML = "<strong>" + infoName + (tower.stats.pathPlaceable ? "" : " Tower (Level " + tower.level + ")") + "</strong><br>" + (tower.stats.pathPlaceable ? "" : "Damage: " + tower.stats.damage + " | Range: " + tower.stats.range + " | Fire Rate: " + (1000 / tower.stats.fireRate).toFixed(1) + "/s | Accuracy: " + accPercent + "%") + extraInfo;
+                if (tower.stats.pathPlaceable) {
+                    upgradeBtn.textContent = "⬆️ Cannot Upgrade Traps";
+                    upgradeBtn.disabled = true;
+                    upgradeBtn.style.opacity = "0.5";
+                } else if (tower.level >= 3) {
                     upgradeBtn.textContent = "⬆️ MAX LEVEL";
                     upgradeBtn.disabled = true;
                     upgradeBtn.style.opacity = "0.5";
@@ -2041,7 +2425,8 @@
             if (!gameState.selectedTower) return;
             const towerType = towerTypes[gameState.selectedTower];
             if (gameState.gold < towerType.cost) return;
-            if (isValidTowerPosition(x, y)) {
+            const pathPlaceable = towerType.pathPlaceable || false;
+            if (isValidTowerPosition(x, y, pathPlaceable)) {
                 gameState.towers.push(new Tower(x, y, gameState.selectedTower));
                 gameState.gold -= towerType.cost;
                 gameState.towersPlacedThisGame++;
@@ -2056,8 +2441,23 @@
             }
         }
 
-        function isValidTowerPosition(x, y) {
-            // Tower center must be at least 19px from path center line (average tower radius)
+        function isValidTowerPosition(x, y, pathPlaceable = false) {
+            if (pathPlaceable) {
+                let onPath = false;
+                for (let i = 0; i < path.length - 1; i++) {
+                    const p1 = path[i];
+                    const p2 = path[i + 1];
+                    const dist = pointToSegmentDistance(x, y, p1.x, p1.y, p2.x, p2.y);
+                    if (dist < 14) { onPath = true; break; }
+                }
+                if (!onPath) return false;
+                for (let tower of gameState.towers) {
+                    if (!tower.stats.pathPlaceable) continue;
+                    const dist = Math.sqrt(Math.pow(tower.x - x, 2) + Math.pow(tower.y - y, 2));
+                    if (dist < 35) return false;
+                }
+                return true;
+            }
             const PATH_MIN_DIST = 19;
             for (let i = 0; i < path.length - 1; i++) {
                 const p1 = path[i];
@@ -2065,13 +2465,12 @@
                 const dist = pointToSegmentDistance(x, y, p1.x, p1.y, p2.x, p2.y);
                 if (dist < PATH_MIN_DIST) return false;
             }
-            // Check distance from path corner points
             for (let point of path) {
                 const dist = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
                 if (dist < PATH_MIN_DIST) return false;
             }
-            // Tower centers must be at least 44px apart
             for (let tower of gameState.towers) {
+                if (tower.stats.pathPlaceable) continue;
                 const dist = Math.sqrt(Math.pow(tower.x - x, 2) + Math.pow(tower.y - y, 2));
                 if (dist < 44) return false;
             }
@@ -2228,7 +2627,7 @@
             const selectedTheme = levelThemes[mapIndex];
             currentTheme = {
                 ...selectedTheme,
-                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat"],
+                towers: ["cannon","laser","missile","sniper","freeze","plasma","electric","poison","piat","voidRift"],
                 enemies: ["basic","fast","heavy","armored","flying"]
             };
             path = currentTheme.path;
@@ -2273,8 +2672,6 @@
             overlay.appendChild(restartBtn);
             document.body.appendChild(overlay);
         }
-
-
 
         function startWave() {
             if (gameState.waveInProgress) return;
@@ -2323,7 +2720,6 @@
                         unlockAchievement("bossSlayer");
                         showUnlockMessage("💰 BOSS DEFEATED! +150 Gold Bonus! 💰");
                     }
-                    // Check wave achievements
                     if (completedWave >= 5) unlockAchievement("wave5");
                     if (completedWave >= 10) unlockAchievement("wave10");
                     if (completedWave >= 15) unlockAchievement("wave15");
@@ -2331,7 +2727,6 @@
                     if (gameState.speedMultiplier === 4) unlockAchievement("speedDemon");
                     updateUI();
                     if (isBossWave) {
-                        
                         if (!gameState.endlessMode) {
                             setTimeout(() => { advanceToNextLevel(); }, 2000);
                         }
@@ -2405,13 +2800,14 @@
                 const emoji = {
                     cannon: "🔴", laser: "🪫", missile: "🚀",
                     sniper: "🎯", freeze: "❄️", plasma: "⭐",
-                    electric: "⚡", poison: "☠️", piat: "💥"
+                    electric: "⚡", poison: "☠️", piat: "💥",
+                    mine: "💣", acidPool: "🧪", spikeTrap: "🪤",
+                    empMine: "🔌", voidRift: "🌌"
                 }[type];
-                const displayName = type === "piat" ? "PIAT" : type.charAt(0).toUpperCase() + type.slice(1);
+                const displayName = type === "piat" ? "PIAT" : type === "acidPool" ? "Acid Pool" : type === "mine" ? "Mine" : type === "spikeTrap" ? "Spike Trap" : type === "empMine" ? "EMP Mine" : type === "voidRift" ? "Void Rift" : type.charAt(0).toUpperCase() + type.slice(1);
                 button.textContent = emoji + " " + displayName + " (" + tower.cost + ")";
                 towersContainer.appendChild(button);
             });
-            // Add spell button if this theme has one
             const spell = currentTheme.spell;
             if (spell) {
                 const spellBtn = document.createElement("button");
@@ -2421,14 +2817,15 @@
                 spellBtn.textContent = spell.emoji + " " + spell.name + " (Spell)";
                 towersContainer.appendChild(spellBtn);
             }
-        }function togglePause() {
+        }
+
+        function togglePause() {
             gameState.paused = !gameState.paused;
             document.querySelector("#controls button:nth-child(2)").textContent =
                 gameState.paused ? "▶️ Resume" : "⏸️ Pause";
         }
 
         function resetGame() {
-            // Clear any active spell timers/intervals before resetting
             if (gameState.spellTimer) {
                 clearInterval(gameState.spellTimer);
                 clearTimeout(gameState.spellTimer);
@@ -2473,7 +2870,6 @@
             document.getElementById("lives").textContent = gameState.lives;
             document.getElementById("wave").textContent = gameState.wave;
             document.getElementById("waveMax").textContent = gameState.endlessMode ? "" : "/15";
-
             document.getElementById("level").textContent = gameState.endlessMode ? "ENDLESS" : gameState.level;
             const themeEmoji = {
                 "Classic": "🏰", "Sci-Fi": "🤖", "Biohazard": "☣️",
@@ -2491,7 +2887,6 @@
         }
 
         function drawPath() {
-            // Outer glow layer (solid, lighter color)
             ctx.strokeStyle = currentTheme.pathColorLight;
             ctx.lineWidth = 32;
             ctx.lineCap = "round";
@@ -2501,7 +2896,6 @@
                 ctx.lineTo(path[i].x, path[i].y);
             }
             ctx.stroke();
-            // Inner core layer (solid, main color)
             ctx.strokeStyle = currentTheme.pathColor;
             ctx.lineWidth = 24;
             ctx.beginPath();
@@ -2514,23 +2908,25 @@
 
         function drawRangePreview() {
             if (!gameState.selectedTower || !towerTypes[gameState.selectedTower]) return;
-            const range = towerTypes[gameState.selectedTower].range;
-            ctx.strokeStyle = "rgba(255,255,255,0.4)";
-            ctx.lineWidth = 2;
-            ctx.setLineDash([8, 8]);
-            ctx.beginPath();
-            ctx.arc(mouseX, mouseY, range, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            // Draw if valid position
-            const valid = isValidTowerPosition(mouseX, mouseY);
+            const towerType = towerTypes[gameState.selectedTower];
+            const range = towerType.range;
+            const pathPlaceable = towerType.pathPlaceable || false;
+            if (!pathPlaceable) {
+                ctx.strokeStyle = "rgba(255,255,255,0.4)";
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 8]);
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, range, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            const valid = isValidTowerPosition(mouseX, mouseY, pathPlaceable);
             ctx.fillStyle = valid ? "rgba(46,204,113,0.2)" : "rgba(231,76,60,0.2)";
             ctx.beginPath();
-            ctx.arc(mouseX, mouseY, 15, 0, Math.PI * 2);
+            ctx.arc(mouseX, mouseY, pathPlaceable ? towerType.size : 15, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        // ===== SPELL SYSTEM =====
         function castSpell() {
             const spell = currentTheme.spell;
             if (!spell) return;
@@ -2538,7 +2934,6 @@
             if (gameState.spellActive) return;
 
             gameState.spellActive = true;
-            // Cooldown is set immediately for instant spells, after duration for temp spells
 
             switch (currentTheme.name) {
                 case "Classic":
@@ -2562,55 +2957,50 @@
         }
 
         function castBoost() {
-            // 2x damage for all towers for 15s, cooldown starts after spell ends
             gameState.towers.forEach(tower => {
                 tower.stats.damage *= 2;
             });
             showUnlockMessage("⚡ BOOST! Towers deal 2x damage for 15s!");
             gameState.spellTimer = setTimeout(() => {
-                if (!gameState.spellActive) return; // spell was cancelled (e.g. player died)
+                if (!gameState.spellActive) return;
                 gameState.towers.forEach(tower => {
                     tower.stats.damage /= 2;
                 });
                 gameState.spellActive = false;
-                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown;
                 showUnlockMessage("⚡ Boost ended - cooldown started");
                 updateSpellButton();
             }, 15000);
         }
 
         function castOverdrive() {
-            // 2x fire rate for all towers for 15s, cooldown starts after spell ends
             gameState.towers.forEach(tower => {
                 tower.stats.fireRate /= 2;
             });
             showUnlockMessage("🔋 OVERDRIVE! Towers fire 2x faster for 15s!");
             gameState.spellTimer = setTimeout(() => {
-                if (!gameState.spellActive) return; // spell was cancelled (e.g. player died)
+                if (!gameState.spellActive) return;
                 gameState.towers.forEach(tower => {
                     tower.stats.fireRate *= 2;
                 });
                 gameState.spellActive = false;
-                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown;
                 showUnlockMessage("🔋 Overdrive ended - cooldown started");
                 updateSpellButton();
             }, 15000);
         }
 
         function castQuarantine() {
-            // Halt spawning, apply high-damage permanent poison to all enemies
-            // Resume spawning only after all enemies die or exit
             const wasInProgress = gameState.waveInProgress;
-            gameState.waveInProgress = false; // pause spawning
+            gameState.waveInProgress = false;
 
             gameState.enemies.forEach(enemy => {
-                enemy.poisoned = -1; // permanent poison until death
-                enemy.poisonDamage = 25; // high damage
+                enemy.poisoned = -1;
+                enemy.poisonDamage = 25;
             });
 
             showUnlockMessage("☣️ QUARANTINE! Spawning halted - all enemies quarantined!");
 
-            // Spawn poison particles continuously while poisoned enemies exist
             const particleInterval = setInterval(() => {
                 if (!gameState.gameRunning) {
                     clearInterval(particleInterval);
@@ -2631,7 +3021,6 @@
                 });
             }, 100);
 
-            // Check every 500ms if all enemies are gone
             const checkInterval = setInterval(() => {
                 if (!gameState.gameRunning) {
                     clearInterval(particleInterval);
@@ -2640,18 +3029,16 @@
                 }
 
                 if (gameState.enemies.length === 0) {
-                    // All enemies dead or exited
                     clearInterval(particleInterval);
                     clearInterval(checkInterval);
 
-                    // Resume spawning if wave still has enemies to spawn
                     if (gameState.enemiesSpawned < gameState.enemiesInWave) {
                         gameState.waveInProgress = wasInProgress;
                     }
 
-                    if (gameState.spellActive) { // only if spell wasn't already cancelled
+                    if (gameState.spellActive) {
                         gameState.spellActive = false;
-                        gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                        gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown;
                         showUnlockMessage("☣️ Quarantine lifted - all enemies cleared!");
                         updateSpellButton();
                     }
@@ -2660,7 +3047,6 @@
         }
 
         function castAirstrike() {
-            // Massive damage to all enemies, cooldown starts immediately
             const damage = 5000;
             let killed = 0;
 
@@ -2687,11 +3073,9 @@
             gameState.spellActive = false;
             gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown;
             updateUI();
-            // Cooldown already set in castSpell()
         }
 
         function castCosmicStorm() {
-            // Randomly kill enemies with purple lightning until the wave ends
             showUnlockMessage("🌌 COSMIC STORM! The void hungers until this wave ends...");
 
             const flash = document.createElement("div");
@@ -2699,14 +3083,12 @@
             document.body.appendChild(flash);
             setTimeout(() => { if (document.body.contains(flash)) document.body.removeChild(flash); }, 300 / gameState.speedMultiplier);
 
-            // Strike random enemies every 5 seconds until wave ends
             const stormInterval = setInterval(() => {
-                // End when wave is over or game stops
                 if (!gameState.waveInProgress || !gameState.gameRunning) {
                     clearInterval(stormInterval);
-                    if (gameState.spellActive) { // only if spell wasn't already cancelled
+                    if (gameState.spellActive) {
                         gameState.spellActive = false;
-                        gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown; // cooldown starts after spell ends
+                        gameState.spellCooldownEnd = Date.now() + currentTheme.spell.cooldown;
                         showUnlockMessage("🌌 Cosmic Storm ended - cooldown started");
                         updateSpellButton();
                     }
@@ -2715,13 +3097,11 @@
 
                 if (gameState.enemies.length === 0) return;
 
-                // Kill exactly 1 enemy per strike
                 const numStrikes = 1;
                 for (let i = 0; i < numStrikes; i++) {
                     const target = gameState.enemies[Math.floor(Math.random() * gameState.enemies.length)];
                     if (!target) continue;
 
-                    // Purple lightning effect
                     gameState.lightningEffects.push(new LightningEffect(
                         target.x + (Math.random() - 0.5) * 50,
                         -20,
@@ -2730,7 +3110,6 @@
                         "#b64cfd"
                     ));
 
-                    // Purple explosion particles
                     for (let j = 0; j < 15; j++) {
                         gameState.particles.push(new Particle(
                             target.x, target.y,
@@ -2740,14 +3119,12 @@
                         ));
                     }
 
-                    // Kill the enemy
                     gameState.gold += target.reward;
                     target.createDeathParticles();
                     const idx = gameState.enemies.indexOf(target);
                     if (idx > -1) gameState.enemies.splice(idx, 1);
                 }
 
-                // Purple screen flash
                 const miniFlash = document.createElement("div");
                 miniFlash.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(182,76,253,0.15);pointer-events:none;z-index:2500;";
                 document.body.appendChild(miniFlash);
@@ -2792,6 +3169,13 @@
             if (!gameState.paused) {
                 gameState.enemies = gameState.enemies.filter(enemy => enemy.update());
                 gameState.towers.forEach(tower => tower.update());
+                const deadTraps = gameState.towers.filter(t => t.dead);
+                if (deadTraps.length > 0) {
+                    if (gameState.selectedPlacedTower && gameState.selectedPlacedTower.dead) {
+                        gameState.selectedPlacedTower = null;
+                    }
+                    gameState.towers = gameState.towers.filter(t => !t.dead);
+                }
                 gameState.projectiles = gameState.projectiles.filter(projectile => projectile.update());
                 gameState.particles = gameState.particles.filter(particle => particle.update());
                 gameState.lightningEffects = gameState.lightningEffects.filter(effect => effect.update());
