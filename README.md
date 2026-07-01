@@ -180,4 +180,6 @@ open circles-tower-defence/index.html
 ```
 Or simply drag index.html into your browser window.
 
+---
+
 # ENJOY!!!
