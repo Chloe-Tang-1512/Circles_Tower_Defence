@@ -3,8 +3,6 @@ A tower defence game where all the towers and enemies are circles!
 
 Fully-featured, browser-based tower defense game built with pure HTML5 Canvas and JavaScript. No dependencies, no build step—just open the file and play.
 
-**[Play Now](#)** *(or download `index.html` and open it in your browser)*
-
 ---
 
 ## 🎮 Overview
